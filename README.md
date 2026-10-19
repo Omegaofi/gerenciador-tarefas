@@ -14,6 +14,14 @@ Sistema cliente/servidor em Java para gestão colaborativa de projetos, com dois
 
 ## Visualizador web
 
+**[▶ Abrir o visualizador](https://htmlpreview.github.io/?https://github.com/Omegaofi/gerenciador-tarefas/blob/main/web/index.html)** (pré-visualização direta do GitHub, sem instalar nada)
+
+| Login | Dashboard |
+|---|---|
+| ![Login](docs/login.png) | ![Dashboard](docs/dashboard.png) |
+| **Tarefas** | **Entregas** |
+| ![Tarefas](docs/tarefas.png) | ![Entregas](docs/entregas.png) |
+
 `web/index.html` reproduz as telas do cliente (login, cadastro, dashboard, projetos, tarefas e entregas)
 com a mesma identidade visual e as mesmas regras de negócio, usando dados de exemplo salvos no
 `localStorage` do navegador. Não se conecta ao servidor nem ao MySQL.
