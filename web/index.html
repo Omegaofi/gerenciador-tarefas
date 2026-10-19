@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexProject — Visualizador Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --preto:#0b0b0b; --preto-hover:#262626; --limao:#c6f033; --limao-hover:#b2db22;
+  --fundo:#f2efec; --card:#fff; --campo:#e9e7e2; --borda:#d9d5cf;
+  --texto:#111; --texto-claro:#6e6a64; --texto-menu:#b5b5b5;
+  --vermelho:#d63b3b; --laranja:#f29d1d; --azul:#5bc0de; --limao-sel:#eef9c8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:13px/1.45 "JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;background:var(--fundo);color:var(--texto)}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+
+/* logo */
+.logo{font-weight:700;letter-spacing:.02em}
+.logo b{color:var(--limao)}
+.logo.claro{color:#fff}
+
+/* botões */
+.btn{border:1px solid transparent;padding:10px 18px;font-weight:700;font-size:12px;text-transform:uppercase;cursor:pointer;background:var(--preto);color:#fff}
+.btn:hover{background:var(--preto-hover)}
+.btn.destaque{background:var(--limao);color:var(--texto)} .btn.destaque:hover{background:var(--limao-hover)}
+.btn.sec{background:var(--card);color:var(--texto);border-color:var(--borda)} .btn.sec:hover{background:var(--campo)}
+.btn.perigo{background:var(--card);color:var(--vermelho);border-color:var(--vermelho)} .btn.perigo:hover{background:#fbe9e9}
+.btn:focus-visible,.menu a:focus-visible,.card.proj:focus-visible{outline:2px solid var(--texto);outline-offset:2px}
+
+/* campos */
+.rotulo{display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--texto-claro);margin:14px 0 5px}
+.campo{width:100%;background:var(--campo);border:1px solid var(--borda);padding:9px 10px;border-radius:0}
+.campo:focus{outline:2px solid var(--limao);outline-offset:-1px;background:#fff}
+textarea.campo{resize:vertical;min-height:80px}
+.alerta{color:var(--vermelho);min-height:18px;margin-top:10px;font-size:12px}
+.sub{color:var(--texto-claro);font-size:12px}
+.link{font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:0;padding:0}
+
+/* auth */
+#auth{min-height:100%;display:grid;grid-template-columns:1fr 1fr}
+.auth-lado{background:var(--preto);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:28px}
+.auth-lado .logo{font-size:28px}
+.auth-lado ul{list-style:none;margin:0;padding:0;display:grid;gap:12px;color:var(--texto-menu)}
+.auth-lado li::before{content:"■";color:var(--limao);margin-right:10px}
+.auth-form{display:flex;align-items:center;justify-content:center;padding:32px}
+.auth-form form{width:100%;max-width:380px}
+.auth-form h1{font-size:22px;margin:18px 0 0}
+.seg{display:flex}.seg .btn{flex:1}
+.demo{margin-top:22px;border:1px dashed var(--borda);padding:12px;background:#fff}
+.demo p{margin:0 0 8px}
+.demo .btn{padding:7px 10px;font-size:11px}
+
+/* app */
+#app{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 30px)}
+.menu{background:var(--preto);color:var(--texto-menu);display:flex;flex-direction:column;justify-content:space-between;padding:22px 14px 16px;position:sticky;top:0;height:calc(100vh - 30px)}
+.menu .logo{font-size:18px;padding:0 8px 20px;border-bottom:1px solid #2a2a2a;margin-bottom:14px}
+.menu a{display:block;padding:10px 12px;font-weight:700;font-size:12px;text-transform:uppercase;cursor:pointer;color:var(--texto-menu);text-decoration:none;border:0;background:none;width:100%;text-align:left}
+.menu a:hover{color:#fff}
+.menu a.ativo{background:var(--limao);color:var(--texto)}
+.menu .rodape{border-top:1px solid #2a2a2a;padding-top:8px}
+.usuario{display:flex;gap:10px;align-items:center;margin-top:10px;border-top:1px solid #2a2a2a;padding-top:12px}
+.avatar{width:30px;height:30px;background:var(--limao);color:var(--texto);display:grid;place-items:center;font-weight:700;font-size:14px}
+.usuario b{color:#fff;font-size:12px;display:block}.usuario span{font-size:11px}
+main{padding:28px 32px;min-width:0}
+.cab{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.cab h2{font-size:22px;margin:0 0 4px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--borda);padding:14px 16px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:18px}
+.proj{display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;font:inherit}
+.proj:hover{border-color:var(--texto)}
+.proj .topo{display:flex;justify-content:space-between;align-items:center}
+.marc{width:10px;height:10px;display:inline-block}
+.proj h3{margin:0;font-size:14px}
+.barra{height:5px;background:var(--campo)}.barra i{display:block;height:100%;background:var(--limao)}
+.proj .pe{display:flex;justify-content:space-between}
+.atv h4{margin:0 0 10px;font-size:11px;text-transform:uppercase}
+.atv .l{display:flex;justify-content:space-between;gap:12px;padding:5px 0;flex-wrap:wrap}
+.atv .l::before{content:"■";color:#8fb51a;margin-right:8px}.atv .l span:first-child{flex:1;min-width:200px}
+.atv .l span:first-child::before{content:none}
+
+/* badges */
+.badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border:1px solid var(--borda);background:#fff;color:var(--texto-claro);white-space:nowrap}
+.badge.escuro{background:var(--preto);color:#fff;border-color:var(--preto)}
+.badge.ok{background:var(--limao);color:var(--texto);border-color:var(--limao)}
+.badge.ruim{color:var(--vermelho);border-color:var(--vermelho)}
+
+/* tabela */
+.tabwrap{overflow-x:auto;border:1px solid var(--borda);background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th{background:var(--fundo);color:var(--texto-claro);font-size:11px;text-transform:uppercase;text-align:left;padding:0 12px;height:34px;border-bottom:1px solid var(--borda)}
+td{padding:0 12px;height:38px;border-bottom:1px solid var(--borda)}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:#f8f7f5}
+tbody tr.sel{background:var(--limao-sel)}
+td:first-child{min-width:200px}
+.vazio{padding:22px;text-align:center;color:var(--texto-claro)}
+.acoes{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.filtros{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filtros .btn{padding:7px 12px;font-size:11px}
+.filtros .btn.on{background:var(--preto);color:#fff}
+
+/* modal / toast */
+.fundo-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px;z-index:10}
+.modal{background:var(--fundo);border:1px solid var(--borda);width:100%;max-width:460px;max-height:92vh;overflow:auto;padding:24px}
+.modal h3{margin:0 0 2px;font-size:18px}
+.modal .acoes{justify-content:flex-end;margin-top:20px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--preto);color:#fff;padding:10px 18px;border-left:4px solid var(--limao);z-index:20;max-width:90vw}
+.faixa{background:var(--preto);color:var(--texto-menu);font-size:11px;padding:6px 12px;text-align:center}
+.faixa button{color:var(--limao);background:none;border:0;text-decoration:underline;cursor:pointer;font:inherit}
+
+@media(max-width:820px){
+  #auth{grid-template-columns:1fr}.auth-lado{padding:28px 20px}
+  #app{grid-template-columns:1fr}
+  .menu{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;padding:12px}
+  .menu .logo{border:0;margin:0;padding:0 8px 0 0}
+  .menu nav{display:flex;flex-wrap:wrap;flex:1}
+  .menu a{width:auto}
+  .menu .rodape{border:0;padding:0;display:flex;align-items:center;gap:8px}
+  .usuario{border:0;margin:0;padding:0}.usuario div:last-child{display:none}
+  main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<div class="faixa">Visualizador de demonstração · dados salvos apenas neste navegador · <button id="reset">restaurar dados de exemplo</button></div>
+
+<!-- AUTENTICAÇÃO -->
+<section id="auth">
+  <div class="auth-lado">
+    <div class="logo claro" style="font-size:28px">NEX<b>PROJECT</b></div>
+    <p style="margin:0;color:var(--texto-menu)">Plataforma de gestão colaborativa</p>
+    <ul>
+      <li>Projetos colaborativos</li><li>Atribuição de tarefas</li>
+      <li>Entrega e revisão de tarefas</li><li>Gestão de arquivos</li>
+    </ul>
+  </div>
+  <div class="auth-form">
+    <form id="formLogin" autocomplete="off">
+      <div class="logo">NEX<b style="color:#8fb51a">PROJECT</b></div>
+      <h1>Entrar na conta</h1>
+      <label class="rotulo" for="lEmail">E-mail</label><input class="campo" id="lEmail" type="email">
+      <label class="rotulo" for="lSenha">Senha</label><input class="campo" id="lSenha" type="password">
+      <div class="alerta" id="lAlerta" role="alert"></div>
+      <button class="btn" style="width:100%;margin-top:6px">Entrar</button>
+      <p class="sub" style="text-align:center;margin-top:16px">Não tem conta? <button type="button" class="link" id="irCadastro">Cadastre-se</button></p>
+      <div class="demo">
+        <p class="sub">Contas de demonstração:</p>
+        <div class="acoes" style="margin:0">
+          <button type="button" class="btn sec" data-demo="ana.silva@email.com">Ana · Criador</button>
+          <button type="button" class="btn sec" data-demo="bruno.costa@email.com">Bruno · Participante</button>
+        </div>
+      </div>
+    </form>
+    <form id="formCadastro" class="hidden" autocomplete="off">
+      <div class="logo">NEX<b style="color:#8fb51a">PROJECT</b></div>
+      <h1>Criar conta</h1>
+      <label class="rotulo" for="cNome">Nome completo</label><input class="campo" id="cNome">
+      <label class="rotulo" for="cEmail">E-mail</label><input class="campo" id="cEmail" type="email">
+      <label class="rotulo" for="cSenha">Senha</label><input class="campo" id="cSenha" type="password">
+      <label class="rotulo" for="cConf">Confirmar senha</label><input class="campo" id="cConf" type="password">
+      <span class="rotulo">Tipo de conta</span>
+      <div class="seg" id="cTipo"><button type="button" class="btn" data-t="criador">Criador</button><button type="button" class="btn sec" data-t="participante">Participante</button></div>
+      <div class="alerta" id="cAlerta" role="alert"></div>
+      <button class="btn" style="width:100%;margin-top:6px">Criar conta</button>
+      <p class="sub" style="text-align:center;margin-top:16px">Já tem conta? <button type="button" class="link" id="irLogin">Entrar</button></p>
+    </form>
+  </div>
+</section>
+
+<!-- APP -->
+<section id="app" class="hidden">
+  <aside class="menu">
+    <div>
+      <div class="logo claro">NEX<b>PROJECT</b></div>
+      <nav id="nav"></nav>
+    </div>
+    <div class="rodape">
+      <a id="sair" role="button" tabindex="0">Sair</a>
+      <div class="usuario"><div class="avatar" id="avatar"></div><div><b id="uNome"></b><span id="uTipo"></span></div></div>
+    </div>
+  </aside>
+  <main id="conteudo"></main>
+</section>
+
+<div id="modal"></div>
+<div id="toast" class="hidden" role="status"></div>
+
+<script>
+(()=>{
+"use strict";
+const CHAVE="nexproject-demo-v1";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- rótulos (Tema.rotuloStatus) ---------- */
+const ROT={planejado:"Planejamento",em_andamento:"Em andamento",concluido:"Concluído",cancelado:"Cancelado",
+ pendente:"Pendente",concluida:"Concluída",atrasada:"Atrasada",enviada:"Aguardando revisão",em_revisao:"Em revisão",
+ aprovada:"Aprovada",rejeitada:"Rejeitada",criador:"Criador",participante:"Participante"};
+const classeBadge=s=>["em_andamento","enviada","em_revisao"].includes(s)?"escuro":
+  ["concluido","concluida","aprovada"].includes(s)?"ok":["atrasada","cancelado","rejeitada"].includes(s)?"ruim":"";
+const badge=s=>`<span class="badge ${classeBadge(s)}">${esc(ROT[s]||s)}</span>`;
+const corProjeto=s=>({em_andamento:"var(--limao)",planejado:"var(--laranja)",concluido:"var(--azul)"}[s]||"var(--borda)");
+const AREAS=["Desenvolvimento Web","Desenvolvimento Mobile","Desenvolvimento Desktop","Jogos","Ciência de Dados","Inteligência Artificial","Design / UX","Infraestrutura e Redes","Outra"];
+
+/* ---------- dados de exemplo (baseados no .sql) ---------- */
+const hoje=new Date();
+const dia=(d)=>{const x=new Date(hoje);x.setDate(x.getDate()+d);return x.toISOString().slice(0,10)};
+const agora=(m)=>new Date(hoje.getTime()-m*60000).toISOString();
+function seed(){
+  return {seq:100,sessao:null,
+   usuarios:[
+    {id:1,nome:"Ana Silva",email:"ana.silva@email.com",senha:"123456",tipo:"criador",biografia:"Gestora de projetos."},
+    {id:2,nome:"Bruno Costa",email:"bruno.costa@email.com",senha:"123456",tipo:"participante",biografia:"Desenvolvedor backend."},
+    {id:3,nome:"Carla Mendes",email:"carla.mendes@email.com",senha:"123456",tipo:"participante",biografia:"Designer de interfaces."}],
+   projetos:[
+    {id:1,titulo:"Sistema de Vendas",descricao:"Aplicação web para controle de vendas.",area:"Desenvolvimento Web",status:"em_andamento",dono:1},
+    {id:2,titulo:"App de Entregas",descricao:"Aplicativo mobile para acompanhar entregas.",area:"Desenvolvimento Mobile",status:"planejado",dono:1},
+    {id:3,titulo:"Portal Institucional",descricao:"Novo site da empresa.",area:"Design / UX",status:"concluido",dono:1}],
+   tarefas:[
+    {id:1,titulo:"Criar API de produtos",prazo:dia(10),status:"pendente",projeto:1,resp:2},
+    {id:2,titulo:"Modelar banco de dados",prazo:dia(-5),status:"concluida",projeto:1,resp:2},
+    {id:3,titulo:"Protótipo das telas",prazo:dia(-2),status:"atrasada",projeto:1,resp:3},
+    {id:4,titulo:"Tela de login mobile",prazo:dia(21),status:"em_andamento",projeto:2,resp:3},
+    {id:5,titulo:"Layout da home",prazo:dia(-30),status:"concluida",projeto:3,resp:3},
+    {id:6,titulo:"Publicar no servidor",prazo:dia(-25),status:"concluida",projeto:3,resp:2}],
+   arquivos:[
+    {id:1,nome:"Entrega - Modelar banco de dados",url:"https://github.com/exemplo/vendas/tree/main/banco",usuario:2,tarefa:2},
+    {id:2,nome:"Entrega - Layout da home",url:"https://figma.com/file/exemplo",usuario:3,tarefa:5},
+    {id:3,nome:"Entrega - Tela de login mobile",url:"https://github.com/exemplo/app/pull/3",usuario:3,tarefa:4}],
+   entregas:[
+    {id:1,data:agora(3000),status:"aprovada",tarefa:2,arquivo:1},
+    {id:2,data:agora(60000),status:"aprovada",tarefa:5,arquivo:2},
+    {id:3,data:agora(90),status:"enviada",tarefa:4,arquivo:3}]};
+}
+let db;
+function carregar(){try{db=JSON.parse(localStorage.getItem(CHAVE))}catch(e){}; if(!db||!db.usuarios)db=seed()}
+function salvar(){try{localStorage.setItem(CHAVE,JSON.stringify(db))}catch(e){}}
+const id=()=>++db.seq;
+const U=i=>db.usuarios.find(u=>u.id===i), P=i=>db.projetos.find(p=>p.id===i), T=i=>db.tarefas.find(t=>t.id===i), A=i=>db.arquivos.find(a=>a.id===i);
+const eu=()=>U(db.sessao);
+const criador=()=>eu()?.tipo==="criador";
+const fmtData=d=>d?new Date(d.length===10?d+"T00:00":d).toLocaleDateString("pt-BR"):"";
+const fmtHora=d=>new Date(d).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});
+
+/* ---------- visões por perfil (espelham os métodos ...PorCriador / ...PorResponsavel) ---------- */
+const meusProjetos=()=>criador()?db.projetos.filter(p=>p.dono===db.sessao):
+  [...new Set(minhasTarefas().map(t=>t.projeto))].map(P);
+const minhasTarefas=()=>criador()?db.tarefas.filter(t=>P(t.projeto)?.dono===db.sessao):db.tarefas.filter(t=>t.resp===db.sessao);
+const minhasEntregas=()=>{const ids=new Set(minhasTarefas().map(t=>t.id));
+  return db.entregas.filter(e=>ids.has(e.tarefa)).sort((a,b)=>b.data.localeCompare(a.data))};
+
+/* ---------- UI util ---------- */
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.add("hidden"),2600)}
+function modal({titulo,sub,corpo,ok,acao,confirmar}){
+  const el=$("#modal");
+  el.innerHTML=`<div class="fundo-modal"><form class="modal" role="dialog" aria-modal="true" aria-label="${esc(titulo)}">
+    <h3>${esc(titulo)}</h3><div class="sub">${esc(sub||"")}</div>${corpo||""}
+    <div class="alerta" id="mAlerta" role="alert"></div>
+    <div class="acoes"><button type="button" class="btn sec" id="mCancel">Cancelar</button><button class="btn ${confirmar==="perigo"?"perigo":""}">${esc(ok)}</button></div></form></div>`;
+  const fechar=()=>{el.innerHTML=""};
+  const f=el.querySelector("form");
+  el.querySelector("#mCancel").onclick=fechar;
+  el.querySelector(".fundo-modal").onmousedown=e=>{if(e.target.classList.contains("fundo-modal"))fechar()};
+  f.onsubmit=e=>{e.preventDefault();const erro=acao(f);if(erro){el.querySelector("#mAlerta").textContent=erro}else{fechar()}};
+  const p=f.querySelector("input,select,textarea"); if(p)p.focus(); else f.querySelector(".acoes .btn:last-child").focus();
+}
+const campo=(rot,html)=>`<label class="rotulo">${rot}</label>${html}`;
+const opts=(arr,sel)=>arr.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(sel)?"selected":""}>${esc(l)}</option>`).join("");
+
+/* ---------- navegação ---------- */
+let tela="dashboard", filtro="", selecionada=null;
+function ir(t){tela=t;selecionada=null;filtro="";render()}
+function render(){
+  const logado=eu(); if(!logado){mostrarAuth();return}
+  $("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
+  $("#avatar").textContent=logado.nome[0].toUpperCase();
+  $("#uNome").textContent=logado.nome.split(/\s+/)[0];$("#uTipo").textContent=ROT[logado.tipo];
+  const itens=[["dashboard","Dashboard"],...(criador()?[["projetos","Projetos"],["tarefas","Tarefas"]]:[["tarefas","Minhas tarefas"]]),["entregas","Entregas"]];
+  $("#nav").innerHTML=itens.map(([k,l])=>`<a role="button" tabindex="0" data-k="${k}" class="${k===tela?"ativo":""}">${l}</a>`).join("");
+  ({dashboard:vDashboard,projetos:vProjetos,tarefas:vTarefas,entregas:vEntregas})[tela]();
+}
+$("#nav").addEventListener("click",e=>{const a=e.target.closest("[data-k]");if(a)ir(a.dataset.k)});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("a[role=button]")){e.preventDefault();e.target.click()}});
+$("#sair").onclick=()=>{db.sessao=null;salvar();mostrarAuth()};
+const cab=(t,s,acao="")=>`<div class="cab"><div><h2>${t}</h2><div class="sub">${s}</div></div><div>${acao}</div></div>`;
+
+/* ---------- Dashboard ---------- */
+function vDashboard(){
+  const ps=meusProjetos(), ts=minhasTarefas(), es=minhasEntregas();
+  const ativos=ps.filter(p=>!["concluido","cancelado"].includes(p.status)).length;
+  const sub=criador()?`${ativos} ${ativos===1?"projeto ativo":"projetos ativos"}`:`${ps.length} ${ps.length===1?"projeto com tarefas para você":"projetos com tarefas para você"}`;
+  const cards=ps.map(p=>{
+    const tp=ts.filter(t=>t.projeto===p.id), c=tp.filter(t=>t.status==="concluida").length;
+    const m=new Set(tp.map(t=>t.resp)).size;
+    return `<button class="card proj" data-p="${p.id}"><div class="topo"><span class="marc" style="background:${corProjeto(p.status)}"></span>${badge(p.status)}</div>
+      <div><h3>${esc(p.titulo)}</h3>${p.area?`<div class="sub">${esc(p.area)}</div>`:""}</div>
+      <div class="barra"><i style="width:${tp.length?c/tp.length*100:0}%"></i></div>
+      <div class="pe sub"><span>${c}/${tp.length} tarefas</span><span>${m} ${m===1?"membro":"membros"}</span></div></button>`}).join("");
+  const vazio=`<div class="card sub">${criador()?'Você ainda não criou projetos. Clique em "+ NOVO PROJETO" para começar.':"Nenhuma tarefa foi atribuída a você ainda."}</div>`;
+  const atv=es.slice(0,5).map(e=>{const t=T(e.tarefa);const quem=criador()?U(t.resp)?.nome:"Você";
+    return `<div class="l"><span>${esc(quem)} enviou «${esc(t.titulo)}» — ${esc(ROT[e.status].toLowerCase())}</span><span class="sub">${fmtHora(e.data)}</span></div>`}).join("")||'<span class="sub">Nenhuma entrega registrada ainda.</span>';
+  $("#conteudo").innerHTML=cab("Meus Projetos",sub,criador()?'<button class="btn" id="novoP">+ Novo projeto</button>':"")+
+    `<div class="grade">${cards||vazio}</div><div class="card atv"><h4>Atividade recente</h4>${atv}</div>`;
+  $("#conteudo").querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>ir("tarefas"));
+  const n=$("#novoP"); if(n)n.onclick=()=>formProjeto();
+}
+
+/* ---------- tabelas genéricas ---------- */
+function tabela(cols,linhas,vazio){
+  if(!linhas.length)return `<div class="tabwrap"><div class="vazio">${vazio}</div></div>`;
+  return `<div class="tabwrap"><table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${
+    linhas.map(l=>`<tr data-id="${l.id}" class="${l.id===selecionada?"sel":""}">${l.cels.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function ligarSelecao(){
+  $("#conteudo").querySelectorAll("tbody tr").forEach(tr=>tr.onclick=()=>{selecionada=+tr.dataset.id;
+    $("#conteudo").querySelectorAll("tbody tr").forEach(x=>x.classList.toggle("sel",x===tr))});
+}
+const exigir=(msg)=>{if(selecionada==null){toast(msg);return false}return true};
+
+/* ---------- Projetos ---------- */
+function vProjetos(){
+  const ps=meusProjetos();
+  $("#conteudo").innerHTML=cab("Projetos","Projetos criados por você",'<button class="btn" id="novo">+ Novo projeto</button>')+
+    tabela(["Título","Descrição","Status"],ps.map(p=>({id:p.id,cels:[`<b>${esc(p.titulo)}</b>`,esc(p.descricao||""),badge(p.status)]})),"Nenhum projeto cadastrado.")+
+    `<div class="acoes"><button class="btn sec" id="ed">Editar</button><button class="btn perigo" id="ex">Excluir</button></div>`;
+  ligarSelecao();
+  $("#novo").onclick=()=>formProjeto();
+  $("#ed").onclick=()=>exigir("Selecione um projeto para editar.")&&formProjeto(P(selecionada));
+  $("#ex").onclick=()=>{if(!exigir("Selecione um projeto para excluir."))return;const p=P(selecionada);
+    modal({titulo:"Confirmar exclusão",sub:`Excluir o projeto "${p.titulo}"? As tarefas dele também serão removidas.`,ok:"Excluir",confirmar:"perigo",acao:()=>{
+      const tids=db.tarefas.filter(t=>t.projeto===p.id).map(t=>t.id);
+      db.entregas=db.entregas.filter(e=>!tids.includes(e.tarefa));
+      db.arquivos=db.arquivos.filter(a=>!tids.includes(a.tarefa));
+      db.tarefas=db.tarefas.filter(t=>t.projeto!==p.id);
+      db.projetos=db.projetos.filter(x=>x.id!==p.id);selecionada=null;salvar();render();toast("Projeto excluído com sucesso!")}})};
+}
+function formProjeto(p){
+  modal({titulo:p?"Editar projeto":"Novo projeto",sub:"Responsável: "+eu().nome,ok:p?"Salvar":"Criar projeto",
+   corpo:campo("Título",`<input class="campo" name="titulo" value="${esc(p?.titulo)}">`)+
+    campo("Descrição",`<textarea class="campo" name="descricao">${esc(p?.descricao)}</textarea>`)+
+    campo("Área de atuação",`<select class="campo" name="area">${opts(AREAS.map(a=>[a,a]),p?.area)}</select>`)+
+    campo("Status",`<select class="campo" name="status">${opts(["planejado","em_andamento","concluido","cancelado"].map(s=>[s,ROT[s]]),p?.status||"planejado")}</select>`),
+   acao:f=>{const d=Object.fromEntries(new FormData(f));if(!d.titulo.trim())return "Informe o título do projeto.";
+     if(p)Object.assign(p,{titulo:d.titulo.trim(),descricao:d.descricao,area:d.area,status:d.status});
+     else db.projetos.push({id:id(),titulo:d.titulo.trim(),descricao:d.descricao,area:d.area,status:d.status,dono:db.sessao});
+     salvar();render();toast(p?"Projeto atualizado com sucesso!":"Projeto criado com sucesso!")}});
+}
+
+/* ---------- Tarefas ---------- */
+const FILTROS=[["","Todas"],["pendente","Pendente"],["em_andamento","Em andamento"],["concluida","Concluída"],["atrasada","Atrasada"]];
+function vTarefas(){
+  const ts=minhasTarefas().filter(t=>!filtro||t.status===filtro);
+  const c=criador();
+  $("#conteudo").innerHTML=cab(c?"Tarefas":"Minhas tarefas",c?"Tarefas dos seus projetos":"Tarefas atribuídas a você",c?'<button class="btn" id="nova">+ Nova tarefa</button>':"")+
+    `<div class="filtros">${FILTROS.map(([v,l])=>`<button class="btn sec ${v===filtro?"on":""}" data-f="${v}">${l}</button>`).join("")}</div>`+
+    tabela(["Título","Projeto","Responsável","Prazo","Status"],ts.map(t=>({id:t.id,cels:[`<b>${esc(t.titulo)}</b>`,esc(P(t.projeto)?.titulo),esc(U(t.resp)?.nome),fmtData(t.prazo),badge(t.status)]})),"Nenhuma tarefa encontrada.")+
+    `<div class="acoes">${c?'<button class="btn sec" id="ed">Editar</button><button class="btn perigo" id="ex">Excluir</button>':'<button class="btn destaque" id="ent">Enviar entrega da tarefa selecionada</button>'}</div>`;
+  ligarSelecao();
+  $("#conteudo").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;render()});
+  if(c){
+    $("#nova").onclick=()=>formTarefa();
+    $("#ed").onclick=()=>exigir("Selecione uma tarefa para editar.")&&formTarefa(T(selecionada));
+    $("#ex").onclick=()=>{if(!exigir("Selecione uma tarefa para excluir."))return;const t=T(selecionada);
+      modal({titulo:"Confirmar exclusão",sub:`Excluir a tarefa "${t.titulo}"?`,ok:"Excluir",confirmar:"perigo",acao:()=>{
+        db.entregas=db.entregas.filter(e=>e.tarefa!==t.id);db.tarefas=db.tarefas.filter(x=>x.id!==t.id);selecionada=null;salvar();render();toast("Tarefa excluída com sucesso!")}})};
+  }else $("#ent").onclick=()=>{
+    if(!exigir("Selecione uma tarefa para entregar."))return;const t=T(selecionada);
+    if(t.status==="concluida")return toast("Esta tarefa já foi concluída.");
+    if(db.entregas.some(e=>e.tarefa===t.id&&["enviada","em_revisao"].includes(e.status)))return toast("Já existe uma entrega desta tarefa aguardando revisão do criador.");
+    formEntrega(t)};
+}
+function formTarefa(t){
+  const ps=meusProjetos(), parts=db.usuarios.filter(u=>u.tipo==="participante");
+  if(!ps.length)return toast("Crie um projeto antes de cadastrar tarefas.");
+  modal({titulo:t?"Editar tarefa":"Nova tarefa",sub:"Defina o prazo e o colaborador responsável",ok:t?"Salvar":"Criar tarefa",
+   corpo:campo("Título",`<input class="campo" name="titulo" value="${esc(t?.titulo)}">`)+
+    campo("Projeto",`<select class="campo" name="projeto">${opts(ps.map(p=>[p.id,p.titulo]),t?.projeto)}</select>`)+
+    campo("Colaborador responsável",`<select class="campo" name="resp">${opts(parts.map(u=>[u.id,u.nome]),t?.resp)}</select>`)+
+    campo("Prazo de entrega",`<input class="campo" type="date" name="prazo" value="${t?.prazo||dia(7)}">`)+
+    campo("Status",`<select class="campo" name="status">${opts(["pendente","em_andamento","concluida"].map(s=>[s,ROT[s]]),t?.status||"pendente")}</select>`),
+   acao:f=>{const d=Object.fromEntries(new FormData(f));if(!d.titulo.trim())return "Informe o título da tarefa.";
+     const v={titulo:d.titulo.trim(),projeto:+d.projeto,resp:+d.resp,prazo:d.prazo,status:d.status};
+     if(t)Object.assign(t,v);else db.tarefas.push({id:id(),...v});
+     salvar();render();toast(t?"Tarefa atualizada com sucesso!":"Tarefa criada com sucesso!")}});
+}
+function formEntrega(t){
+  modal({titulo:"Enviar entrega",sub:`${t.titulo} · prazo: ${t.prazo?fmtData(t.prazo):"sem prazo"}`,ok:"Enviar entrega",
+   corpo:campo("Descrição da entrega",`<input class="campo" name="desc" value="${esc("Entrega - "+t.titulo)}">`)+
+    campo("Link do arquivo ou repositório",`<input class="campo" name="url" placeholder="https://...">`),
+   acao:f=>{const d=Object.fromEntries(new FormData(f));if(!d.desc.trim())return "Descreva a entrega.";
+     const url=d.url.trim();if(url&&!/^https?:\/\//i.test(url))return "O link deve começar com http:// ou https://";
+     const a={id:id(),nome:d.desc.trim(),url,usuario:db.sessao,tarefa:t.id};db.arquivos.push(a);
+     db.entregas.push({id:id(),data:new Date().toISOString(),status:"enviada",tarefa:t.id,arquivo:a.id});
+     salvar();render();toast("Entrega enviada! O criador do projeto vai revisar.")}});
+}
+
+/* ---------- Entregas ---------- */
+function vEntregas(){
+  const es=minhasEntregas(), c=criador();
+  $("#conteudo").innerHTML=cab(c?"Entregas":"Minhas entregas",c?"Revise o que os colaboradores entregaram":"Acompanhe a revisão das suas entregas")+
+    tabela(["Tarefa","Projeto","Colaborador","Enviada em","Status"],es.map(e=>{const t=T(e.tarefa);
+      return {id:e.id,cels:[`<b>${esc(t.titulo)}</b>`,esc(P(t.projeto)?.titulo),esc(U(t.resp)?.nome),fmtHora(e.data),badge(e.status)]}}),"Nenhuma entrega registrada ainda.")+
+    `<div class="acoes"><button class="btn sec" id="abrir">Abrir link</button>${c?'<button class="btn destaque" id="ap">Aprovar</button><button class="btn perigo" id="rej">Rejeitar</button>':""}</div>`;
+  ligarSelecao();
+  $("#abrir").onclick=()=>{if(!exigir("Selecione uma entrega."))return;const url=A(db.entregas.find(e=>e.id===selecionada).arquivo)?.url;
+    url?window.open(url,"_blank","noopener,noreferrer"):toast("Esta entrega não tem link.")};
+  if(c){
+    const avaliar=novo=>{if(!exigir("Selecione uma entrega."))return;const e=db.entregas.find(x=>x.id===selecionada);
+      if(!["enviada","em_revisao"].includes(e.status))return toast(`Esta entrega já foi ${ROT[e.status].toLowerCase()}.`);
+      modal({titulo:"Revisar entrega",sub:novo==="aprovada"?"Aprovar a entrega? A tarefa será marcada como concluída.":'Rejeitar a entrega? A tarefa volta para "em andamento" para o colaborador refazer.',
+        ok:novo==="aprovada"?"Aprovar":"Rejeitar",confirmar:novo==="aprovada"?"":"perigo",acao:()=>{
+        e.status=novo;T(e.tarefa).status=novo==="aprovada"?"concluida":"em_andamento";salvar();render();toast("Revisão salva.")}})};
+    $("#ap").onclick=()=>avaliar("aprovada");$("#rej").onclick=()=>avaliar("rejeitada");
+  }
+}
+
+/* ---------- autenticação ---------- */
+function mostrarAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");alternar(false)}
+function alternar(cad){$("#formLogin").classList.toggle("hidden",cad);$("#formCadastro").classList.toggle("hidden",!cad)}
+$("#irCadastro").onclick=()=>alternar(true);$("#irLogin").onclick=()=>alternar(false);
+function entrar(u){db.sessao=u.id;salvar();tela="dashboard";selecionada=null;filtro="";$("#lSenha").value="";render()}
+$("#formLogin").onsubmit=e=>{e.preventDefault();const em=$("#lEmail").value.trim().toLowerCase(),se=$("#lSenha").value;
+  if(!em||!se)return $("#lAlerta").textContent="Informe e-mail e senha.";
+  const u=db.usuarios.find(x=>x.email.toLowerCase()===em&&x.senha===se);
+  if(!u)return $("#lAlerta").textContent="E-mail ou senha incorretos.";$("#lAlerta").textContent="";entrar(u)};
+document.querySelectorAll("[data-demo]").forEach(b=>b.onclick=()=>entrar(db.usuarios.find(u=>u.email===b.dataset.demo)));
+let tipoCad="criador";
+$("#cTipo").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;tipoCad=b.dataset.t;
+  $("#cTipo").querySelectorAll(".btn").forEach(x=>x.classList.toggle("sec",x.dataset.t!==tipoCad))};
+$("#formCadastro").onsubmit=e=>{e.preventDefault();const al=$("#cAlerta");
+  const n=$("#cNome").value.trim(),em=$("#cEmail").value.trim().toLowerCase(),s=$("#cSenha").value;
+  if(!n||!em||!s)return al.textContent="Preencha nome, e-mail e senha.";
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return al.textContent="Informe um e-mail válido.";
+  if(s!==$("#cConf").value)return al.textContent="As senhas não conferem.";
+  if(db.usuarios.some(u=>u.email.toLowerCase()===em))return al.textContent="Não foi possível criar a conta. Este e-mail já está em uso?";
+  db.usuarios.push({id:id(),nome:n,email:em,senha:s,tipo:tipoCad,biografia:""});salvar();al.textContent="";
+  e.target.reset();alternar(false);$("#lEmail").value=em;toast("Conta criada com sucesso! Faça login para continuar.")};
+
+$("#reset").onclick=()=>{db=seed();salvar();mostrarAuth();toast("Dados de exemplo restaurados.")};
+
+carregar();render();
+})();
+</script>
+</body>
+</html>
