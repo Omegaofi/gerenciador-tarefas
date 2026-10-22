@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="3"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="3"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="painelMarca" min="-2" pref="490" max="-2" attributes="0"/>
+              <Component id="painelForm" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Component id="painelMarca" alignment="0" max="32767" attributes="0"/>
+          <Component id="painelForm" alignment="0" max="32767" attributes="0"/>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="painelMarca">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="b" green="b" red="b" type="rgb"/>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+            <Group type="103" groupAlignment="0" attributes="0">
+                <Group type="102" alignment="0" attributes="0">
+                    <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                    <Group type="103" groupAlignment="0" attributes="0">
+                        <Component id="lblLogo" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblChamada" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblCopyright" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblDestaque1" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblDestaque2" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblDestaque3" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="lblDestaque4" alignment="0" min="-2" max="-2" attributes="0"/>
+                    </Group>
+                    <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                </Group>
+            </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+            <Group type="103" groupAlignment="0" attributes="0">
+                <Group type="102" alignment="0" attributes="0">
+                    <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                    <Component id="lblLogo" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                    <Component id="lblChamada" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                    <Component id="lblDestaque1" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                    <Component id="lblDestaque2" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                    <Component id="lblDestaque3" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                    <Component id="lblDestaque4" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                    <Component id="lblCopyright" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                </Group>
+            </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="lblLogo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="NEXPROJECT"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblChamada">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;Colabore em projetos, gerencie tarefas e&lt;br&gt;acompanhe entregas &#x2014; tudo em um s&#xf3; lugar.&lt;/html&gt;"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="dd" green="dd" red="dd" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblCopyright">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&#xa9; 2026 NexProject"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="55" green="55" red="55" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblDestaque1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;span style=&#x27;color:#C6F033&#x27;&gt;&#x25a0;&lt;/span&gt;&amp;nbsp; Projetos colaborativos&lt;/html&gt;"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b5" green="b5" red="b5" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblDestaque2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;span style=&#x27;color:#C6F033&#x27;&gt;&#x25a0;&lt;/span&gt;&amp;nbsp; Atribui&#xe7;&#xe3;o de tarefas&lt;/html&gt;"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b5" green="b5" red="b5" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblDestaque3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;span style=&#x27;color:#C6F033&#x27;&gt;&#x25a0;&lt;/span&gt;&amp;nbsp; Entrega e revis&#xe3;o de tarefas&lt;/html&gt;"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b5" green="b5" red="b5" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblDestaque4">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;span style=&#x27;color:#C6F033&#x27;&gt;&#x25a0;&lt;/span&gt;&amp;nbsp; Gest&#xe3;o de arquivos&lt;/html&gt;"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="b5" green="b5" red="b5" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="painelForm">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ec" green="ef" red="f2" type="rgb"/>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+            <Group type="103" groupAlignment="0" attributes="0">
+                <Group type="102" alignment="0" attributes="0">
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                    <Group type="103" groupAlignment="0" attributes="0">
+                        <Component id="lblLogoPequeno" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblPlataforma" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblTitulo" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblAlerta" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblNome" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="txtNome" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblEmail" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="txtEmail" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblSenha" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="txtSenha" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblConfirmar" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="txtConfirmar" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="lblTipo" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Component id="btnCriar" alignment="0" min="-2" pref="320" max="-2" attributes="0"/>
+                        <Group type="102" alignment="0" attributes="0">
+                            <Component id="btnCriador" min="-2" pref="156" max="-2" attributes="0"/>
+                            <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                            <Component id="btnParticipante" min="-2" pref="156" max="-2" attributes="0"/>
+                        </Group>
+                        <Group type="102" alignment="2" attributes="0">
+                            <Component id="lblJaTemConta" min="-2" max="-2" attributes="0"/>
+                            <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                            <Component id="lnkEntrar" min="-2" max="-2" attributes="0"/>
+                        </Group>
+                    </Group>
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                </Group>
+            </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+            <Group type="103" groupAlignment="0" attributes="0">
+                <Group type="102" alignment="0" attributes="0">
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                    <Component id="lblLogoPequeno" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                    <Component id="lblPlataforma" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                    <Component id="lblTitulo" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                    <Component id="lblAlerta" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                    <Component id="lblNome" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                    <Component id="txtNome" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                    <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                    <Component id="txtEmail" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                    <Component id="lblSenha" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                    <Component id="txtSenha" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                    <Component id="lblConfirmar" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                    <Component id="txtConfirmar" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                    <Component id="lblTipo" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                    <Group type="103" groupAlignment="0" attributes="0">
+                        <Component id="btnCriador" alignment="0" min="-2" max="-2" attributes="0"/>
+                        <Component id="btnParticipante" alignment="0" min="-2" max="-2" attributes="0"/>
+                    </Group>
+                    <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                    <Component id="btnCriar" min="-2" max="-2" attributes="0"/>
+                    <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                    <Group type="103" groupAlignment="3" attributes="0">
+                        <Component id="lblJaTemConta" alignment="3" min="-2" max="-2" attributes="0"/>
+                        <Component id="lnkEntrar" alignment="3" min="-2" max="-2" attributes="0"/>
+                    </Group>
+                    <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                </Group>
+            </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="lblLogoPequeno">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="NEXPROJECT"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="11" green="11" red="11" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblPlataforma">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Plataforma de gest&#xe3;o colaborativa"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblTitulo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Criar conta"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="11" green="11" red="11" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblAlerta">
+          <Properties>
+            <Property name="text" type="java.lang.String" value=" "/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="3b" green="3b" red="d6" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblNome">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Nome completo"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtNome">
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblEmail">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="E-mail"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtEmail">
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblSenha">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Senha"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JPasswordField" name="txtSenha">
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblConfirmar">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Confirmar senha"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JPasswordField" name="txtConfirmar">
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblTipo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Tipo de conta"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnCriador">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Criador"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnParticipante">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Participante"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnCriar">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Criar conta  &#x2192;"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblJaTemConta">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="J&#xe1; tem conta?"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="64" green="6a" red="6e" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lnkEntrar">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Entrar"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="11" green="11" red="11" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>

@@ -1,28 +1,29 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
 package gerenciador.tarefas.cliente.view;
 
 import gerenciador.tarefas.cliente.GerenciadorTarefasCliente;
 import gerenciador.tarefas.cliente.controller.ConexaoController;
 import gerenciador.tarefas.cliente.view.tablemodel.TarefaTableModel;
 import gerenciador.tarefas.cliente.view.tema.Tema;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTable;
 import modelDominio.EntregaTarefa;
 import modelDominio.Tarefa;
 import modelDominio.Usuario;
 
 /**
- * Criador: todas as tarefas dos seus projetos (criar, editar, excluir).
- * Participante (RF005): somente as tarefas atribuídas a ele, com o envio da entrega (RF006).
+ *
+ * @author jpcar
  */
-public class TabelaTarefa extends TelaBase {
+public class TabelaTarefa extends javax.swing.JFrame {
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TabelaTarefa.class.getName());
 
     private static final String[][] FILTROS = {
         {"TODAS", null}, {"PENDENTE", "pendente"}, {"EM ANDAMENTO", "em_andamento"},
@@ -30,37 +31,48 @@ public class TabelaTarefa extends TelaBase {
 
     private final ConexaoController conexao = GerenciadorTarefasCliente.conexaoCliente;
     private final boolean criador = conexao.isCriador();
-    private final JTable jTable1 = new JTable();
-    private final JPanel painelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    private JButton[] botoesFiltro;
     private TarefaTableModel tarefaModel;
     private String filtroAtual;
 
+    /**
+     * Criador: todas as tarefas dos seus projetos (criar, editar, excluir).
+     * Participante (RF005): somente as tarefas atribuídas a ele, com o envio da entrega (RF006).
+     */
     public TabelaTarefa() {
-        super(conexao().isCriador() ? "Tarefas" : "Minhas tarefas", TAREFAS);
+        initComponents();
+        PainelTela.configurarJanela(this, criador ? "Tarefas" : "Minhas tarefas");
+        PainelTela.configurarMenu(this, PainelTela.TAREFAS, new PainelTela.Menu(lblLogo, lblDashboard,
+                lblProjetos, lblTarefas, lblEntregas, lblSair, lblAvatar, lblNome, lblTipo));
 
-        JButton botaoNova = null;
-        if (criador) {
-            botaoNova = Tema.botaoPrimario("+ Nova");
-            botaoNova.addActionListener(e -> new FormTarefa(this, null, this::refreshTabelaTarefa).setVisible(true));
+        lblTitulo.setText(criador ? "Tarefas" : "Minhas tarefas");
+        lblSubtitulo.setText(criador ? "Tarefas dos seus projetos" : "Tarefas atribuídas a você");
+        Tema.titulo(lblTitulo);
+        Tema.subtitulo(lblSubtitulo);
+
+        botoesFiltro = new JButton[]{btnTodas, btnPendente, btnAndamento, btnConcluida, btnAtrasada};
+        for (int i = 0; i < botoesFiltro.length; i++) {
+            String valor = FILTROS[i][1];
+            botoesFiltro[i].addActionListener(e -> {
+                filtroAtual = valor;
+                atualizarTabelaTarefas();
+            });
         }
-        JPanel topo = new JPanel(new BorderLayout(0, 16));
-        topo.setOpaque(false);
-        topo.add(cabecalho(criador ? "Tarefas" : "Minhas tarefas",
-                criador ? "Tarefas dos seus projetos" : "Tarefas atribuídas a você", botaoNova), BorderLayout.NORTH);
-        painelFiltros.setOpaque(false);
-        topo.add(painelFiltros, BorderLayout.SOUTH);
-        conteudo.add(topo, BorderLayout.NORTH);
 
+        btnNova.setVisible(criador);
+        btnEditar.setVisible(criador);
+        btnExcluir.setVisible(criador);
+        btnEntregar.setVisible(!criador);
+        Tema.primario(btnNova).addActionListener(e -> new FormTarefa(this, null, this::refreshTabelaTarefa).setVisible(true));
+        Tema.secundario(btnEditar).addActionListener(e -> editarSelecionada());
+        Tema.perigo(btnExcluir).addActionListener(e -> excluirSelecionada());
+        Tema.destaque(btnEntregar).addActionListener(e -> entregarSelecionada());
+
+        PainelTela.estilizarTabela(jScrollPane1, tabela);
         atualizarTabelaTarefas();
-        conteudo.add(tabelaEstilizada(jTable1, TarefaTableModel.COLUNA_STATUS), BorderLayout.CENTER);
 
         if (criador) {
-            JButton botaoEditar = Tema.botaoSecundario("Editar");
-            botaoEditar.addActionListener(e -> editarSelecionada());
-            JButton botaoExcluir = Tema.botaoPerigo("Excluir");
-            botaoExcluir.addActionListener(e -> excluirSelecionada());
-            conteudo.add(barraAcoes(botaoEditar, botaoExcluir), BorderLayout.SOUTH);
-            jTable1.addMouseListener(new MouseAdapter() {
+            tabela.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent evt) {
                     if (evt.getClickCount() == 2) {
@@ -68,31 +80,298 @@ public class TabelaTarefa extends TelaBase {
                     }
                 }
             });
-        } else {
-            JButton botaoEntregar = Tema.botaoDestaque("Enviar entrega da tarefa selecionada");
-            botaoEntregar.addActionListener(e -> entregarSelecionada());
-            conteudo.add(barraAcoes(botaoEntregar), BorderLayout.SOUTH);
         }
     }
 
-    private static ConexaoController conexao() {
-        return GerenciadorTarefasCliente.conexaoCliente;
-    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        painelMenu = new javax.swing.JPanel();
+        lblLogo = new javax.swing.JLabel();
+        separador1 = new javax.swing.JPanel();
+        lblDashboard = new javax.swing.JLabel();
+        lblProjetos = new javax.swing.JLabel();
+        lblTarefas = new javax.swing.JLabel();
+        lblEntregas = new javax.swing.JLabel();
+        separador2 = new javax.swing.JPanel();
+        lblSair = new javax.swing.JLabel();
+        separador3 = new javax.swing.JPanel();
+        lblAvatar = new javax.swing.JLabel();
+        lblNome = new javax.swing.JLabel();
+        lblTipo = new javax.swing.JLabel();
+        painelConteudo = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        lblSubtitulo = new javax.swing.JLabel();
+        btnNova = new javax.swing.JButton();
+        btnTodas = new javax.swing.JButton();
+        btnPendente = new javax.swing.JButton();
+        btnAndamento = new javax.swing.JButton();
+        btnConcluida = new javax.swing.JButton();
+        btnAtrasada = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tabela = new javax.swing.JTable();
+        btnEditar = new javax.swing.JButton();
+        btnExcluir = new javax.swing.JButton();
+        btnEntregar = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        lblLogo.setText("NEXPROJECT");
+        lblLogo.setForeground(new java.awt.Color(255, 255, 255));
+
+        separador1.setBackground(new java.awt.Color(42, 42, 42));
+        javax.swing.GroupLayout separador1Layout = new javax.swing.GroupLayout(separador1);
+        separador1.setLayout(separador1Layout);
+        separador1Layout.setHorizontalGroup(
+            separador1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        separador1Layout.setVerticalGroup(
+            separador1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        lblDashboard.setText("DASHBOARD");
+        lblDashboard.setOpaque(true);
+        lblDashboard.setBackground(new java.awt.Color(11, 11, 11));
+        lblDashboard.setForeground(new java.awt.Color(181, 181, 181));
+
+        lblProjetos.setText("PROJETOS");
+        lblProjetos.setOpaque(true);
+        lblProjetos.setBackground(new java.awt.Color(11, 11, 11));
+        lblProjetos.setForeground(new java.awt.Color(181, 181, 181));
+
+        lblTarefas.setText("TAREFAS");
+        lblTarefas.setOpaque(true);
+        lblTarefas.setBackground(new java.awt.Color(198, 240, 51));
+        lblTarefas.setForeground(new java.awt.Color(17, 17, 17));
+
+        lblEntregas.setText("ENTREGAS");
+        lblEntregas.setOpaque(true);
+        lblEntregas.setBackground(new java.awt.Color(11, 11, 11));
+        lblEntregas.setForeground(new java.awt.Color(181, 181, 181));
+
+        separador2.setBackground(new java.awt.Color(42, 42, 42));
+        javax.swing.GroupLayout separador2Layout = new javax.swing.GroupLayout(separador2);
+        separador2.setLayout(separador2Layout);
+        separador2Layout.setHorizontalGroup(
+            separador2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        separador2Layout.setVerticalGroup(
+            separador2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        lblSair.setText("SAIR");
+        lblSair.setOpaque(true);
+        lblSair.setBackground(new java.awt.Color(11, 11, 11));
+        lblSair.setForeground(new java.awt.Color(181, 181, 181));
+
+        separador3.setBackground(new java.awt.Color(42, 42, 42));
+        javax.swing.GroupLayout separador3Layout = new javax.swing.GroupLayout(separador3);
+        separador3.setLayout(separador3Layout);
+        separador3Layout.setHorizontalGroup(
+            separador3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        separador3Layout.setVerticalGroup(
+            separador3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        lblAvatar.setText("J");
+        lblAvatar.setOpaque(true);
+        lblAvatar.setBackground(new java.awt.Color(198, 240, 51));
+        lblAvatar.setForeground(new java.awt.Color(17, 17, 17));
+        lblAvatar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+        lblNome.setText("Nome");
+        lblNome.setForeground(new java.awt.Color(255, 255, 255));
+
+        lblTipo.setText("Criador");
+        lblTipo.setForeground(new java.awt.Color(181, 181, 181));
+
+        painelMenu.setBackground(new java.awt.Color(11, 11, 11));
+        javax.swing.GroupLayout painelMenuLayout = new javax.swing.GroupLayout(painelMenu);
+        painelMenu.setLayout(painelMenuLayout);
+        painelMenuLayout.setHorizontalGroup(
+            painelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelMenuLayout.createSequentialGroup()
+                    .addGap(14, 14, 14)
+                    .addGroup(painelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(separador1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblProjetos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTarefas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblEntregas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(separador2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblSair, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(separador3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(painelMenuLayout.createSequentialGroup()
+                            .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(10, 10, 10)
+                            .addGroup(painelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTipo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGap(14, 14, 14))
+        );
+        painelMenuLayout.setVerticalGroup(
+            painelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelMenuLayout.createSequentialGroup()
+                    .addGap(22, 22, 22)
+                    .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(20, 20, 20)
+                    .addComponent(separador1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(14, 14, 14)
+                    .addComponent(lblDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblProjetos, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTarefas, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblEntregas, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(separador2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(8, 8, 8)
+                    .addComponent(lblSair, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(8, 8, 8)
+                    .addComponent(separador3, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(12, 12, 12)
+                    .addGroup(painelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(painelMenuLayout.createSequentialGroup()
+                            .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGap(16, 16, 16))
+        );
+
+        lblTitulo.setText("Titulo");
+        lblTitulo.setForeground(new java.awt.Color(17, 17, 17));
+
+        lblSubtitulo.setText("Subtitulo");
+        lblSubtitulo.setForeground(new java.awt.Color(110, 106, 100));
+
+        btnNova.setText("+ Nova");
+
+        btnTodas.setText("Todas");
+
+        btnPendente.setText("Pendente");
+
+        btnAndamento.setText("Em andamento");
+
+        btnConcluida.setText("Concluída");
+
+        btnAtrasada.setText("Atrasada");
+
+        tabela.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Título", "Projeto", "Responsável", "Prazo", "Status"
+            }
+        ));
+
+        jScrollPane1.setViewportView(tabela);
+
+        btnEditar.setText("Editar");
+
+        btnExcluir.setText("Excluir");
+
+        btnEntregar.setText("Enviar entrega da tarefa selecionada");
+
+        painelConteudo.setBackground(new java.awt.Color(242, 239, 236));
+        javax.swing.GroupLayout painelConteudoLayout = new javax.swing.GroupLayout(painelConteudo);
+        painelConteudo.setLayout(painelConteudoLayout);
+        painelConteudoLayout.setHorizontalGroup(
+            painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelConteudoLayout.createSequentialGroup()
+                    .addGap(32, 32, 32)
+                    .addGroup(painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelConteudoLayout.createSequentialGroup()
+                            .addGroup(painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblSubtitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(0, 0, Short.MAX_VALUE)
+                            .addComponent(btnNova, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(painelConteudoLayout.createSequentialGroup()
+                            .addComponent(btnTodas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(6, 6, 6)
+                            .addComponent(btnPendente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(6, 6, 6)
+                            .addComponent(btnAndamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(6, 6, 6)
+                            .addComponent(btnConcluida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(6, 6, 6)
+                            .addComponent(btnAtrasada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(painelConteudoLayout.createSequentialGroup()
+                            .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnEntregar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGap(32, 32, 32))
+        );
+        painelConteudoLayout.setVerticalGroup(
+            painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelConteudoLayout.createSequentialGroup()
+                    .addGap(28, 28, 28)
+                    .addGroup(painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelConteudoLayout.createSequentialGroup()
+                            .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(4, 4, 4)
+                            .addComponent(lblSubtitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnNova, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(16, 16, 16)
+                    .addGroup(painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnTodas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnPendente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAndamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnConcluida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAtrasada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(18, 18, 18)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addGap(18, 18, 18)
+                    .addGroup(painelConteudoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnEntregar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(28, 28, 28))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(painelMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(painelConteudo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(painelMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(painelConteudo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
 
     private void montarFiltros() {
-        painelFiltros.removeAll();
-        for (String[] filtro : FILTROS) {
-            boolean ativo = filtroAtual == null ? filtro[1] == null : filtroAtual.equals(filtro[1]);
-            JButton chip = ativo ? Tema.botaoPrimario(filtro[0]) : Tema.botaoSecundario(filtro[0]);
-            chip.addActionListener(e -> {
-                filtroAtual = filtro[1];
-                atualizarTabelaTarefas();
-            });
-            painelFiltros.add(chip);
-            painelFiltros.add(Box.createHorizontalStrut(6));
+        for (int i = 0; i < botoesFiltro.length; i++) {
+            String valor = FILTROS[i][1];
+            boolean ativo = filtroAtual == null ? valor == null : filtroAtual.equals(valor);
+            if (ativo) {
+                Tema.primario(botoesFiltro[i]);
+            } else {
+                Tema.secundario(botoesFiltro[i]);
+            }
         }
-        painelFiltros.revalidate();
-        painelFiltros.repaint();
     }
 
     private void atualizarTabelaTarefas() {
@@ -107,8 +386,8 @@ public class TabelaTarefa extends TelaBase {
             }
         }
         tarefaModel = new TarefaTableModel(visiveis);
-        jTable1.setModel(tarefaModel);
-        jTable1.getColumnModel().getColumn(TarefaTableModel.COLUNA_STATUS).setCellRenderer(Tema.rendererStatus());
+        tabela.setModel(tarefaModel);
+        tabela.getColumnModel().getColumn(TarefaTableModel.COLUNA_STATUS).setCellRenderer(Tema.rendererStatus());
         montarFiltros();
     }
 
@@ -117,7 +396,7 @@ public class TabelaTarefa extends TelaBase {
     }
 
     private Tarefa selecionada(String acao) {
-        int linha = jTable1.getSelectedRow();
+        int linha = tabela.getSelectedRow();
         if (linha < 0) {
             JOptionPane.showMessageDialog(this, "Selecione uma tarefa para " + acao + ".");
             return null;
@@ -167,4 +446,59 @@ public class TabelaTarefa extends TelaBase {
         }
         new FormEntrega(this, tarefa, this::refreshTabelaTarefa).setVisible(true);
     }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new TabelaTarefa().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAndamento;
+    private javax.swing.JButton btnAtrasada;
+    private javax.swing.JButton btnConcluida;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEntregar;
+    private javax.swing.JButton btnExcluir;
+    private javax.swing.JButton btnNova;
+    private javax.swing.JButton btnPendente;
+    private javax.swing.JButton btnTodas;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblAvatar;
+    private javax.swing.JLabel lblDashboard;
+    private javax.swing.JLabel lblEntregas;
+    private javax.swing.JLabel lblLogo;
+    private javax.swing.JLabel lblNome;
+    private javax.swing.JLabel lblProjetos;
+    private javax.swing.JLabel lblSair;
+    private javax.swing.JLabel lblSubtitulo;
+    private javax.swing.JLabel lblTarefas;
+    private javax.swing.JLabel lblTipo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel painelConteudo;
+    private javax.swing.JPanel painelMenu;
+    private javax.swing.JPanel separador1;
+    private javax.swing.JPanel separador2;
+    private javax.swing.JPanel separador3;
+    private javax.swing.JTable tabela;
+    // End of variables declaration//GEN-END:variables
 }

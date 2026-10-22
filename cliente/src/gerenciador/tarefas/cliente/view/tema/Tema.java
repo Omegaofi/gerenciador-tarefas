@@ -138,6 +138,103 @@ public final class Tema {
         return label;
     }
 
+    // ---------- Estilo de componentes já criados (ex.: no designer do NetBeans) ----------
+
+    public static JLabel logo(JLabel label, int tamanho, boolean fundoEscuro) {
+        String corNex = fundoEscuro ? "#FFFFFF" : "#0B0B0B";
+        label.setText("<html><span style='color:" + corNex + "'>NEX</span>"
+                + "<span style='color:#C6F033'>PROJECT</span></html>");
+        label.setFont(fonte(Font.BOLD, tamanho));
+        return label;
+    }
+
+    public static JLabel titulo(JLabel label) {
+        label.setFont(fonte(Font.BOLD, 22));
+        label.setForeground(TEXTO);
+        return label;
+    }
+
+    public static JLabel subtitulo(JLabel label) {
+        label.setFont(fonte(Font.PLAIN, 12));
+        label.setForeground(TEXTO_CLARO);
+        return label;
+    }
+
+    public static JLabel rotuloCampo(JLabel label) {
+        label.setText(label.getText().toUpperCase());
+        label.setFont(fonte(Font.BOLD, 11));
+        label.setForeground(TEXTO_CLARO);
+        return label;
+    }
+
+    public static JLabel link(JLabel label) {
+        label.setText("<html><u>" + label.getText() + "</u></html>");
+        label.setFont(fonte(Font.BOLD, 12));
+        label.setForeground(TEXTO);
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return label;
+    }
+
+    public static JButton primario(JButton botao) {
+        return estilizarBotao(botao, PRETO, PRETO_HOVER, Color.WHITE, null);
+    }
+
+    public static JButton destaque(JButton botao) {
+        return estilizarBotao(botao, LIMAO, LIMAO_HOVER, TEXTO, null);
+    }
+
+    public static JButton secundario(JButton botao) {
+        return estilizarBotao(botao, CARD, CAMPO, TEXTO, BORDA);
+    }
+
+    public static JButton perigo(JButton botao) {
+        return estilizarBotao(botao, CARD, new Color(0xFB, 0xE9, 0xE9), VERMELHO, VERMELHO);
+    }
+
+    private static JButton estilizarBotao(JButton botao, Color fundo, Color hover, Color textoCor, Color borda) {
+        botao.setUI(new VisualBotaoNex(fundo, hover, borda));
+        botao.setText(botao.getText().toUpperCase());
+        botao.setFont(fonte(Font.BOLD, 12));
+        botao.setForeground(textoCor);
+        botao.setContentAreaFilled(false);
+        botao.setFocusPainted(false);
+        botao.setBorderPainted(false);
+        botao.setOpaque(false);
+        botao.setRolloverEnabled(true);
+        botao.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        botao.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return botao;
+    }
+
+    /** Pinta o botão plano do NexProject em cima de um JButton comum. */
+    private static class VisualBotaoNex extends javax.swing.plaf.basic.BasicButtonUI {
+
+        private final Color fundo;
+        private final Color hover;
+        private final Color borda;
+
+        VisualBotaoNex(Color fundo, Color hover, Color borda) {
+            this.fundo = fundo;
+            this.hover = hover;
+            this.borda = borda;
+        }
+
+        @Override
+        public void paint(Graphics g, JComponent c) {
+            javax.swing.AbstractButton botao = (javax.swing.AbstractButton) c;
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setColor(botao.getModel().isRollover() || botao.getModel().isPressed() ? hover : fundo);
+            g2.fillRect(0, 0, c.getWidth(), c.getHeight());
+            if (borda != null) {
+                g2.setColor(borda);
+                g2.setStroke(new BasicStroke(1));
+                g2.drawRect(0, 0, c.getWidth() - 1, c.getHeight() - 1);
+            }
+            g2.dispose();
+            super.paint(g, c);
+        }
+    }
+
     // ---------- Botões ----------
 
     public static JButton botaoPrimario(String texto) {
@@ -201,11 +298,14 @@ public final class Tema {
                 BorderFactory.createEmptyBorder(8, 10, 8, 10));
     }
 
-    private static void estilizarCampo(JComponent campo) {
+    public static void estilizarCampo(JComponent campo) {
         campo.setBackground(CAMPO);
         campo.setForeground(TEXTO);
         campo.setBorder(bordaCampo());
         campo.setFont(fonte(Font.PLAIN, 13));
+        if (campo instanceof javax.swing.text.JTextComponent) {
+            ((javax.swing.text.JTextComponent) campo).setCaretColor(TEXTO);
+        }
     }
 
     public static JTextField campoTexto() {
