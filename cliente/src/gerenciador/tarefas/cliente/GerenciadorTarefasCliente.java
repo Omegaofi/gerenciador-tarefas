@@ -1,7 +1,7 @@
 package gerenciador.tarefas.cliente;
 
 import gerenciador.tarefas.cliente.controller.ConexaoController;
-import gerenciador.tarefas.cliente.view.TelaLogin;
+import gerenciador.tarefas.cliente.view.TelaLogin1;
 import gerenciador.tarefas.cliente.view.tema.Tema;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,7 +21,7 @@ public class GerenciadorTarefasCliente {
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                 conexaoCliente = new ConexaoController(in, out);
-                TelaLogin telaLogin = new TelaLogin();
+                TelaLogin1 telaLogin = new TelaLogin1();
                 telaLogin.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NexProject" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/preto</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/limao</item>
+        <item name="colorOnPrimaryContainer">@color/texto</item>
+        <item name="colorSecondary">@color/limao</item>
+        <item name="colorOnSecondary">@color/texto</item>
+        <item name="colorSecondaryContainer">@color/limao</item>
+        <item name="colorOnSecondaryContainer">@color/texto</item>
+        <item name="colorTertiary">@color/limao_hover</item>
+        <item name="colorError">@color/vermelho</item>
+        <item name="android:colorBackground">@color/fundo</item>
+        <item name="colorSurface">@color/card</item>
+        <item name="colorOnSurface">@color/texto</item>
+        <item name="colorOnSurfaceVariant">@color/texto_claro</item>
+        <item name="colorOutline">@color/borda</item>
+        <item name="textInputStyle">@style/Nex.Campo</item>
+        <item name="materialButtonStyle">@style/Nex.Botao</item>
+    </style>
+
+    <!-- Base vazia: os estilos Nex.Titulo, Nex.Subtitulo etc. herdam dela pelo nome -->
+    <style name="Nex" />
+
+    <style name="Nex.Campo" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxStrokeColor">@color/preto</item>
+        <item name="hintTextColor">@color/texto</item>
+    </style>
+
+    <style name="Nex.Campo.Lista" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxStrokeColor">@color/preto</item>
+        <item name="hintTextColor">@color/texto</item>
+    </style>
+
+    <style name="Nex.Botao" parent="Widget.Material3.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+
+    <!-- Botão de destaque: limão com texto preto (como o BotaoDestaque do desktop) -->
+    <style name="Nex.Botao.Destaque">
+        <item name="backgroundTint">@color/limao</item>
+        <item name="android:textColor">@color/texto</item>
+    </style>
+
+    <style name="Nex.Botao.Secundario" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/texto</item>
+        <item name="strokeColor">@color/borda</item>
+    </style>
+
+    <style name="Nex.Botao.Perigo" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/vermelho</item>
+        <item name="strokeColor">@color/vermelho</item>
+    </style>
+
+    <style name="Nex.Titulo">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/texto</item>
+    </style>
+
+    <style name="Nex.Subtitulo">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/texto_claro</item>
+    </style>
+
+    <style name="Nex.Alerta">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/vermelho</item>
+    </style>
+
+    <style name="Nex.Link">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/texto</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+    <style name="Nex.IndicadorMenu" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/limao</item>
+    </style>
+</resources>

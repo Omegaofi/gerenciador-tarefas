@@ -13,6 +13,12 @@ public class Usuario implements Serializable {
     private String biografia;
     private String tipo;
     private Date criadoEm;
+    // Chaves do chat cifrado (opção A do projeto "Chat Cifrado"), todas em Base64.
+    // A pública vai para os outros membros; a privada só viaja trancada com a senha do usuário.
+    private String chavePublica;
+    private String chavePrivadaCifrada;
+    private String saltChave;
+    private String ivChave;
 
     public Usuario(int id, String nome, String email, String senha, String biografia, String tipo, Date criadoEm) {
         this.id = id;
@@ -51,6 +57,15 @@ public class Usuario implements Serializable {
     public void setTipo(String tipo) { this.tipo = tipo; }
     public Date getCriadoEm() { return criadoEm; }
     public void setCriadoEm(Date criadoEm) { this.criadoEm = criadoEm; }
+    public String getChavePublica() { return chavePublica; }
+    public void setChavePublica(String chavePublica) { this.chavePublica = chavePublica; }
+    public String getChavePrivadaCifrada() { return chavePrivadaCifrada; }
+    public void setChavePrivadaCifrada(String chavePrivadaCifrada) { this.chavePrivadaCifrada = chavePrivadaCifrada; }
+    public String getSaltChave() { return saltChave; }
+    public void setSaltChave(String saltChave) { this.saltChave = saltChave; }
+    public String getIvChave() { return ivChave; }
+    public void setIvChave(String ivChave) { this.ivChave = ivChave; }
+    public boolean temChaves() { return chavePublica != null && !chavePublica.isEmpty(); }
 
     @Override
     public String toString() {

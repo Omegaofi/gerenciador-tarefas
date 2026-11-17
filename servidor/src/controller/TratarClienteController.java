@@ -12,6 +12,7 @@ import model.MensagemDao;
 import model.TarefaDao;
 import model.ArquivoDao;
 import model.EntregaTarefaDao;
+import model.InscricaoDao;
 import modelDominio.Usuario;
 import modelDominio.Projeto;
 import modelDominio.Mensagem;
@@ -25,6 +26,9 @@ public class TratarClienteController extends Thread {
     private ObjectInput in;
     private ObjectOutput out;
     private int idUnico;
+    // Quem fez login nesta conexão. Os comandos do chat cifrado usam este usuário,
+    // e não o usuario_id que o cliente manda.
+    private Usuario usuarioLogado;
 
     public TratarClienteController(Socket cliente, int idUnico) {
         this.cliente = cliente;
@@ -55,6 +59,7 @@ public class TratarClienteController extends Thread {
                         System.out.println(user);
                         UsuarioDao usuarioDao = new UsuarioDao();
                         Usuario userLogado = usuarioDao.login(user);
+                        usuarioLogado = userLogado;
                         out.writeObject(userLogado);
                         break;
 
@@ -180,7 +185,8 @@ public class TratarClienteController extends Thread {
                         Tarefa t = (Tarefa) in.readObject();
                         System.out.println(t);
                         tarefaDao = new TarefaDao();
-                        res = tarefaDao.inserir(t);
+                        // Só o dono do projeto cria, e só para um membro do projeto
+                        res = responsavelValido(t) && tarefaDao.inserir(t);
                         out.writeObject(res);
                         break;
                     case "TarefaAtualizar":
@@ -188,7 +194,7 @@ public class TratarClienteController extends Thread {
                         t = (Tarefa) in.readObject();
                         System.out.println(t);
                         tarefaDao = new TarefaDao();
-                        res = tarefaDao.atualizar(t);
+                        res = responsavelValido(t) && tarefaDao.atualizar(t);
                         out.writeObject(res);
                         break;
                     case "TarefaExcluir":
@@ -288,6 +294,109 @@ public class TratarClienteController extends Thread {
                         out.writeObject(res);
                         break;
 
+                    // ---------- Inscrições em projetos ----------
+                    // Todos usam o usuário logado nesta conexão, nunca um id mandado pelo cliente
+                    case "InscricaoProjetosDisponiveis":
+                        out.writeObject("ok");
+                        out.writeObject(usuarioLogado == null ? null
+                                : new InscricaoDao().projetosDisponiveis(usuarioLogado.getId()));
+                        break;
+                    case "InscricaoInscrever":
+                        out.writeObject("ok");
+                        int projetoInscricaoId = (Integer) in.readObject();
+                        res = usuarioLogado != null
+                                && new InscricaoDao().inscrever(projetoInscricaoId, usuarioLogado.getId());
+                        out.writeObject(res);
+                        break;
+                    case "InscricaoPendentesCriador":
+                        out.writeObject("ok");
+                        out.writeObject(usuarioLogado == null ? null
+                                : new InscricaoDao().pendentesDoCriador(usuarioLogado.getId()));
+                        break;
+                    case "InscricaoResponder":
+                        out.writeObject("ok");
+                        int projetoRespostaId = (Integer) in.readObject();
+                        int candidatoId = (Integer) in.readObject();
+                        boolean aceitar = (Boolean) in.readObject();
+                        res = usuarioLogado != null && new InscricaoDao()
+                                .responder(projetoRespostaId, candidatoId, usuarioLogado.getId(), aceitar);
+                        out.writeObject(res);
+                        break;
+                    case "ProjetoParticipantes":
+                        out.writeObject("ok");
+                        int projetoParticipantesId = (Integer) in.readObject();
+                        out.writeObject(usuarioLogado == null ? null
+                                : new InscricaoDao().participantesDoProjeto(projetoParticipantesId, usuarioLogado.getId()));
+                        break;
+                    case "ProjetoListaParticipando":
+                        out.writeObject("ok");
+                        out.writeObject(usuarioLogado == null ? null
+                                : new InscricaoDao().projetosParticipando(usuarioLogado.getId()));
+                        break;
+                    case "UsuarioParticipaDeProjeto":
+                        out.writeObject("ok");
+                        res = usuarioLogado != null
+                                && new InscricaoDao().participaDeAlgumProjeto(usuarioLogado.getId());
+                        out.writeObject(res);
+                        break;
+
+                    // ---------- Chat cifrado ----------
+                    case "UsuarioMigrarLogin":
+                        out.writeObject("ok");
+                        String novoHash = (String) in.readObject();
+                        res = usuarioLogado != null
+                                && new UsuarioDao().trocarSenhaGuardada(usuarioLogado.getId(), novoHash);
+                        out.writeObject(res);
+                        break;
+                    case "UsuarioTrocarSenha":
+                        out.writeObject("ok");
+                        String hashSenhaAtual = (String) in.readObject();
+                        Usuario novosDados = (Usuario) in.readObject();
+                        // Sempre o usuário desta conexão: o cliente não escolhe de quem é a senha
+                        res = usuarioLogado != null
+                                && new UsuarioDao().trocarSenha(usuarioLogado.getId(), hashSenhaAtual, novosDados);
+                        System.out.println("Troca de senha do usuário "
+                                + (usuarioLogado == null ? "?" : usuarioLogado.getId()) + ": " + (res ? "ok" : "recusada"));
+                        out.writeObject(res);
+                        break;
+                    case "UsuarioSalvarChaves":
+                        out.writeObject("ok");
+                        Usuario chaves = (Usuario) in.readObject();
+                        res = usuarioLogado != null
+                                && new UsuarioDao().salvarChaves(usuarioLogado.getId(), chaves);
+                        if (res) {
+                            usuarioLogado.setChavePublica(chaves.getChavePublica());
+                        }
+                        out.writeObject(res);
+                        break;
+                    case "ProjetoMembrosChaves":
+                        out.writeObject("ok");
+                        int projetoMembrosId = (Integer) in.readObject();
+                        MensagemDao membrosDao = new MensagemDao();
+                        boolean membro = usuarioLogado != null
+                                && membrosDao.isMembro(projetoMembrosId, usuarioLogado.getId());
+                        out.writeObject(membro ? membrosDao.membrosComChaves(projetoMembrosId) : null);
+                        break;
+                    case "MensagemInserirCifrada":
+                        out.writeObject("ok");
+                        Mensagem cifrada = (Mensagem) in.readObject();
+                        System.out.println(cifrada + " com " + (cifrada.getChaves() == null ? 0 : cifrada.getChaves().size()) + " copias de K");
+                        res = usuarioLogado != null && cifrada.getProjeto() != null
+                                && new MensagemDao().inserirCifrada(cifrada, usuarioLogado.getId());
+                        out.writeObject(res);
+                        break;
+                    case "MensagemListaPorProjeto":
+                        out.writeObject("ok");
+                        int projetoChatId = (Integer) in.readObject();
+                        int depoisDoId = (Integer) in.readObject();
+                        MensagemDao chatDao = new MensagemDao();
+                        if (usuarioLogado != null && chatDao.isMembro(projetoChatId, usuarioLogado.getId())) {
+                            out.writeObject(chatDao.listaPorProjeto(projetoChatId, depoisDoId, usuarioLogado.getId()));
+                        } else {
+                            out.writeObject(null);   // CT07: quem não é membro não recebe nada
+                        }
+                        break;
+
                     default:
                         System.out.println("Comando inválido");
                 }
@@ -296,5 +405,18 @@ public class TratarClienteController extends Thread {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    /** A tarefa precisa ser de um projeto do usuário logado e ir para um membro desse projeto. */
+    private boolean responsavelValido(Tarefa t) {
+        if (usuarioLogado == null || t == null || t.getProjeto() == null || t.getUsuario() == null) {
+            return false;
+        }
+        boolean ok = new InscricaoDao().podeReceberTarefa(t.getProjeto().getId(), t.getUsuario().getId(), usuarioLogado.getId());
+        if (!ok) {
+            System.out.println("Tarefa recusada: responsável " + t.getUsuario().getId()
+                    + " não é membro do projeto " + t.getProjeto().getId());
+        }
+        return ok;
     }
 }

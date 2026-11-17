@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="3"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblCabecalho" alignment="0" pref="820" max="32767" attributes="0"/>
+                  <Component id="lblSubtitulo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="textAlerta" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblTitulo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jTextFieldTitulo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblProjeto" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jComboBoxProjeto" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblResponsavel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jComboBoxResponsavel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblPrazo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jSpinnerPrazo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lblStatus" alignment="0" max="32767" attributes="0"/>
+                  <Component id="jComboBoxStatus" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="botaoCancelar" attributes="0"/>
+                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                      <Component id="botaoSalvar" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+              <Component id="lblCabecalho" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="lblSubtitulo" attributes="0"/>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+              <Component id="textAlerta" attributes="0"/>
+              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+              <Component id="lblTitulo" attributes="0"/>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Component id="jTextFieldTitulo" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+              <Component id="lblProjeto" attributes="0"/>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Component id="jComboBoxProjeto" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+              <Component id="lblResponsavel" attributes="0"/>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Component id="jComboBoxResponsavel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+              <Component id="lblPrazo" attributes="0"/>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Component id="jSpinnerPrazo" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+              <Component id="lblStatus" attributes="0"/>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Component id="jComboBoxStatus" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="botaoCancelar" alignment="3" attributes="0"/>
+                  <Component id="botaoSalvar" alignment="3" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexTitulo" name="lblCabecalho">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Nova tarefa"/>
+        <Property name="tamanho" type="int" value="18"/>
+      </Properties>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexSubtitulo" name="lblSubtitulo">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Defina o prazo e o colaborador respons&#xe1;vel"/>
+      </Properties>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexTexto" name="textAlerta">
+      <Properties>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="3b" green="3b" red="d6" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value=" "/>
+        <Property name="negrito" type="boolean" value="true"/>
+        <Property name="tamanho" type="int" value="12"/>
+      </Properties>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexRotulo" name="lblTitulo">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="T&#xed;tulo"/>
+      </Properties>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexCampoTexto" name="jTextFieldTitulo">
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexRotulo" name="lblProjeto">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Projeto"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBoxProjeto">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Projeto&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexRotulo" name="lblResponsavel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Colaborador respons&#xe1;vel"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBoxResponsavel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Usuario&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexRotulo" name="lblPrazo">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Prazo de entrega"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JSpinner" name="jSpinnerPrazo">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JSpinner(new javax.swing.SpinnerDateModel())"/>
+      </AuxValues>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.NexRotulo" name="lblStatus">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Status"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBoxStatus">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(Opcao.deStatus(&quot;pendente&quot;, &quot;em_andamento&quot;, &quot;concluida&quot;))"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Opcao&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.BotaoSecundario" name="botaoCancelar">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Cancelar"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoCancelarActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="gerenciador.tarefas.cliente.view.componentes.BotaoPrimario" name="botaoSalvar">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Salvar"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoSalvarActionPerformed"/>
+      </Events>
+    </Component>
+  </SubComponents>
+</Form>

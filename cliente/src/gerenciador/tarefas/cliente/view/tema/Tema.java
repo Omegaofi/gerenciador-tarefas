@@ -1,6 +1,5 @@
 package gerenciador.tarefas.cliente.view.tema;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -12,6 +11,18 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.util.Arrays;
 import java.util.List;
+import gerenciador.tarefas.cliente.view.componentes.BotaoDestaque;
+import gerenciador.tarefas.cliente.view.componentes.BotaoPerigo;
+import gerenciador.tarefas.cliente.view.componentes.BotaoPrimario;
+import gerenciador.tarefas.cliente.view.componentes.BotaoSecundario;
+import gerenciador.tarefas.cliente.view.componentes.NexAreaTexto;
+import gerenciador.tarefas.cliente.view.componentes.NexCampoSenha;
+import gerenciador.tarefas.cliente.view.componentes.NexCampoTexto;
+import gerenciador.tarefas.cliente.view.componentes.NexLink;
+import gerenciador.tarefas.cliente.view.componentes.NexLogo;
+import gerenciador.tarefas.cliente.view.componentes.NexRotulo;
+import gerenciador.tarefas.cliente.view.componentes.NexSubtitulo;
+import gerenciador.tarefas.cliente.view.componentes.NexTitulo;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -100,194 +111,45 @@ public final class Tema {
 
     /** Logotipo "NEX" + "PROJECT" (PROJECT em verde-limão). */
     public static JLabel logo(int tamanho, boolean fundoEscuro) {
-        String corNex = fundoEscuro ? "#FFFFFF" : "#0B0B0B";
-        JLabel label = new JLabel("<html><span style='color:" + corNex + "'>NEX</span>"
-                + "<span style='color:#C6F033'>PROJECT</span></html>");
-        label.setFont(fonte(Font.BOLD, tamanho));
-        return label;
+        return new NexLogo(tamanho, fundoEscuro);
     }
 
     public static JLabel titulo(String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(fonte(Font.BOLD, 22));
-        label.setForeground(TEXTO);
-        return label;
+        return new NexTitulo(texto);
     }
 
     public static JLabel subtitulo(String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(fonte(Font.PLAIN, 12));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+        return new NexSubtitulo(texto);
     }
 
     /** Rótulo pequeno em caixa alta, usado acima dos campos (ex.: "E-MAIL"). */
     public static JLabel rotuloCampo(String texto) {
-        JLabel label = new JLabel(texto.toUpperCase());
-        label.setFont(fonte(Font.BOLD, 11));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+        return new NexRotulo(texto);
     }
 
     /** Texto clicável, como "Cadastre-se". */
     public static JLabel link(String texto) {
-        JLabel label = new JLabel("<html><u>" + texto + "</u></html>");
-        label.setFont(fonte(Font.BOLD, 12));
-        label.setForeground(TEXTO);
-        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return label;
-    }
-
-    // ---------- Estilo de componentes já criados (ex.: no designer do NetBeans) ----------
-
-    public static JLabel logo(JLabel label, int tamanho, boolean fundoEscuro) {
-        String corNex = fundoEscuro ? "#FFFFFF" : "#0B0B0B";
-        label.setText("<html><span style='color:" + corNex + "'>NEX</span>"
-                + "<span style='color:#C6F033'>PROJECT</span></html>");
-        label.setFont(fonte(Font.BOLD, tamanho));
-        return label;
-    }
-
-    public static JLabel titulo(JLabel label) {
-        label.setFont(fonte(Font.BOLD, 22));
-        label.setForeground(TEXTO);
-        return label;
-    }
-
-    public static JLabel subtitulo(JLabel label) {
-        label.setFont(fonte(Font.PLAIN, 12));
-        label.setForeground(TEXTO_CLARO);
-        return label;
-    }
-
-    public static JLabel rotuloCampo(JLabel label) {
-        label.setText(label.getText().toUpperCase());
-        label.setFont(fonte(Font.BOLD, 11));
-        label.setForeground(TEXTO_CLARO);
-        return label;
-    }
-
-    public static JLabel link(JLabel label) {
-        label.setText("<html><u>" + label.getText() + "</u></html>");
-        label.setFont(fonte(Font.BOLD, 12));
-        label.setForeground(TEXTO);
-        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return label;
-    }
-
-    public static JButton primario(JButton botao) {
-        return estilizarBotao(botao, PRETO, PRETO_HOVER, Color.WHITE, null);
-    }
-
-    public static JButton destaque(JButton botao) {
-        return estilizarBotao(botao, LIMAO, LIMAO_HOVER, TEXTO, null);
-    }
-
-    public static JButton secundario(JButton botao) {
-        return estilizarBotao(botao, CARD, CAMPO, TEXTO, BORDA);
-    }
-
-    public static JButton perigo(JButton botao) {
-        return estilizarBotao(botao, CARD, new Color(0xFB, 0xE9, 0xE9), VERMELHO, VERMELHO);
-    }
-
-    private static JButton estilizarBotao(JButton botao, Color fundo, Color hover, Color textoCor, Color borda) {
-        botao.setUI(new VisualBotaoNex(fundo, hover, borda));
-        botao.setText(botao.getText().toUpperCase());
-        botao.setFont(fonte(Font.BOLD, 12));
-        botao.setForeground(textoCor);
-        botao.setContentAreaFilled(false);
-        botao.setFocusPainted(false);
-        botao.setBorderPainted(false);
-        botao.setOpaque(false);
-        botao.setRolloverEnabled(true);
-        botao.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
-        botao.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return botao;
-    }
-
-    /** Pinta o botão plano do NexProject em cima de um JButton comum. */
-    private static class VisualBotaoNex extends javax.swing.plaf.basic.BasicButtonUI {
-
-        private final Color fundo;
-        private final Color hover;
-        private final Color borda;
-
-        VisualBotaoNex(Color fundo, Color hover, Color borda) {
-            this.fundo = fundo;
-            this.hover = hover;
-            this.borda = borda;
-        }
-
-        @Override
-        public void paint(Graphics g, JComponent c) {
-            javax.swing.AbstractButton botao = (javax.swing.AbstractButton) c;
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(botao.getModel().isRollover() || botao.getModel().isPressed() ? hover : fundo);
-            g2.fillRect(0, 0, c.getWidth(), c.getHeight());
-            if (borda != null) {
-                g2.setColor(borda);
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRect(0, 0, c.getWidth() - 1, c.getHeight() - 1);
-            }
-            g2.dispose();
-            super.paint(g, c);
-        }
+        return new NexLink(texto);
     }
 
     // ---------- Botões ----------
 
+    // Os componentes ficam em view.componentes para aparecerem com o visual real no Design do NetBeans
+
     public static JButton botaoPrimario(String texto) {
-        return new BotaoNex(texto, PRETO, PRETO_HOVER, Color.WHITE, null);
+        return new BotaoPrimario(texto);
     }
 
     public static JButton botaoDestaque(String texto) {
-        return new BotaoNex(texto, LIMAO, LIMAO_HOVER, TEXTO, null);
+        return new BotaoDestaque(texto);
     }
 
     public static JButton botaoSecundario(String texto) {
-        return new BotaoNex(texto, CARD, CAMPO, TEXTO, BORDA);
+        return new BotaoSecundario(texto);
     }
 
     public static JButton botaoPerigo(String texto) {
-        return new BotaoNex(texto, CARD, new Color(0xFB, 0xE9, 0xE9), VERMELHO, VERMELHO);
-    }
-
-    /** Botão retangular e plano, pintado à mão para ficar igual em qualquer Windows. */
-    private static class BotaoNex extends JButton {
-
-        private final Color fundo;
-        private final Color hover;
-        private final Color borda;
-
-        BotaoNex(String texto, Color fundo, Color hover, Color textoCor, Color borda) {
-            super(texto.toUpperCase());
-            this.fundo = fundo;
-            this.hover = hover;
-            this.borda = borda;
-            setFont(fonte(Font.BOLD, 12));
-            setForeground(textoCor);
-            setContentAreaFilled(false);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(getModel().isRollover() || getModel().isPressed() ? hover : fundo);
-            g2.fillRect(0, 0, getWidth(), getHeight());
-            if (borda != null) {
-                g2.setColor(borda);
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            }
-            g2.dispose();
-            super.paintComponent(g);
-        }
+        return new BotaoPerigo(texto);
     }
 
     // ---------- Campos ----------
@@ -303,30 +165,19 @@ public final class Tema {
         campo.setForeground(TEXTO);
         campo.setBorder(bordaCampo());
         campo.setFont(fonte(Font.PLAIN, 13));
-        if (campo instanceof javax.swing.text.JTextComponent) {
-            ((javax.swing.text.JTextComponent) campo).setCaretColor(TEXTO);
-        }
     }
 
     public static JTextField campoTexto() {
-        JTextField campo = new JTextField();
-        estilizarCampo(campo);
-        campo.setCaretColor(TEXTO);
-        return campo;
+        return new NexCampoTexto();
     }
 
     public static JPasswordField campoSenha() {
-        JPasswordField campo = new JPasswordField();
-        estilizarCampo(campo);
-        campo.setCaretColor(TEXTO);
-        return campo;
+        return new NexCampoSenha();
     }
 
     public static JTextArea areaTexto(int linhas) {
-        JTextArea area = new JTextArea(linhas, 20);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        estilizarCampo(area);
+        NexAreaTexto area = new NexAreaTexto();
+        area.setRows(linhas);
         return area;
     }
 

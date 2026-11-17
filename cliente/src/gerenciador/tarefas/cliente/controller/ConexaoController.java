@@ -2,9 +2,11 @@ package gerenciador.tarefas.cliente.controller;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import gerenciador.tarefas.cliente.cripto.ChatCifrado;
 import java.util.ArrayList;
 import modelDominio.Arquivo;
 import modelDominio.EntregaTarefa;
+import modelDominio.Inscricao;
 import modelDominio.Mensagem;
 import modelDominio.Projeto;
 import modelDominio.Tarefa;
@@ -15,10 +17,17 @@ public class ConexaoController {
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
     private Usuario usuarioLogado;
+    private final ChatCifrado chatCifrado;
 
     public ConexaoController(ObjectInputStream in, ObjectOutputStream out) {
         this.in = in;
         this.out = out;
+        this.chatCifrado = new ChatCifrado(this);
+    }
+
+    /** Chaves do chat do usuário logado (abertas no login). */
+    public ChatCifrado getChatCifrado() {
+        return chatCifrado;
     }
 
     public Usuario getUsuarioLogado() {
@@ -27,6 +36,9 @@ public class ConexaoController {
 
     public void setUsuarioLogado(Usuario usuarioLogado) {
         this.usuarioLogado = usuarioLogado;
+        if (usuarioLogado == null) {
+            chatCifrado.fechar();   // logout: a chave privada sai da memória
+        }
     }
 
     // Criador = idealizador do projeto; Participante = colaborador
@@ -389,6 +401,195 @@ public class ConexaoController {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    // ---------- Inscrições em projetos ----------
+
+    /** Projetos em que o usuário logado pode se inscrever. Inscricao.status null = ainda não inscrito. */
+    public ArrayList<Inscricao> inscricaoProjetosDisponiveis() {
+        try {
+            out.writeObject("InscricaoProjetosDisponiveis");
+            in.readObject();
+            ArrayList<Inscricao> lista = (ArrayList<Inscricao>) in.readObject();
+            return lista != null ? lista : new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public boolean inscricaoInscrever(int projetoId) {
+        try {
+            out.writeObject("InscricaoInscrever");
+            in.readObject();
+            out.writeObject(projetoId);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Inscrições pendentes nos projetos do criador logado. */
+    public ArrayList<Inscricao> inscricaoPendentesCriador() {
+        try {
+            out.writeObject("InscricaoPendentesCriador");
+            in.readObject();
+            ArrayList<Inscricao> lista = (ArrayList<Inscricao>) in.readObject();
+            return lista != null ? lista : new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /** O criador logado aceita ou recusa a inscrição do usuário no projeto. */
+    public boolean inscricaoResponder(int projetoId, int usuarioId, boolean aceitar) {
+        try {
+            out.writeObject("InscricaoResponder");
+            in.readObject();
+            out.writeObject(projetoId);
+            out.writeObject(usuarioId);
+            out.writeObject(aceitar);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Quem pode receber tarefa no projeto (participantes aceitos). Vazio se o projeto não for do logado. */
+    public ArrayList<Usuario> projetoParticipantes(int projetoId) {
+        try {
+            out.writeObject("ProjetoParticipantes");
+            in.readObject();
+            out.writeObject(projetoId);
+            ArrayList<Usuario> lista = (ArrayList<Usuario>) in.readObject();
+            return lista != null ? lista : new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /** Projetos em que o usuário logado foi aceito. */
+    public ArrayList<Projeto> projetoListaParticipando() {
+        try {
+            out.writeObject("ProjetoListaParticipando");
+            in.readObject();
+            ArrayList<Projeto> lista = (ArrayList<Projeto>) in.readObject();
+            return lista != null ? lista : new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /** True se o usuário logado já participa de algum projeto. */
+    public boolean usuarioParticipaDeProjeto() {
+        try {
+            out.writeObject("UsuarioParticipaDeProjeto");
+            in.readObject();
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ---------- Chat cifrado ----------
+
+    /**
+     * Login com o hashLogin (PBKDF2 da senha) no lugar da senha.
+     * O servidor guarda o usuário logado nesta conexão.
+     */
+    public Usuario usuarioLoginHash(String email, String hashLogin) {
+        return usuarioLogin(new Usuario(email, hashLogin));
+    }
+
+    /** Conta antiga: troca o BCrypt(senha) guardado por BCrypt(hashLogin). Só para o usuário logado. */
+    public boolean usuarioMigrarLogin(String novoHashGuardado) {
+        try {
+            out.writeObject("UsuarioMigrarLogin");
+            in.readObject();
+            out.writeObject(novoHashGuardado);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Troca a senha do usuário logado.
+     *
+     * @param hashAtual PBKDF2(senha atual, e-mail): o servidor confere antes de trocar
+     * @param novosDados senha = BCrypt(PBKDF2(senha nova)) e a chave privada trancada com a senha nova
+     */
+    public boolean usuarioTrocarSenha(String hashAtual, Usuario novosDados) {
+        try {
+            out.writeObject("UsuarioTrocarSenha");
+            in.readObject();
+            out.writeObject(hashAtual);
+            out.writeObject(novosDados);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Envia a pública e a privada trancada. O servidor só aceita se o usuário ainda não tiver chaves. */
+    public boolean usuarioSalvarChaves(Usuario chaves) {
+        try {
+            out.writeObject("UsuarioSalvarChaves");
+            in.readObject();
+            out.writeObject(chaves);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Membros do projeto (criador + participantes) com a chave pública. Null se o logado não for membro. */
+    public ArrayList<Usuario> projetoMembrosChaves(int projetoId) {
+        try {
+            out.writeObject("ProjetoMembrosChaves");
+            in.readObject();
+            out.writeObject(projetoId);
+            return (ArrayList<Usuario>) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean mensagemInserirCifrada(Mensagem mensagem) {
+        try {
+            out.writeObject("MensagemInserirCifrada");
+            in.readObject();
+            out.writeObject(mensagem);
+            return (boolean) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Mensagens do projeto com id &gt; depoisDoId, cada uma só com a cópia de K do usuário logado. */
+    public ArrayList<Mensagem> mensagemListaPorProjeto(int projetoId, int depoisDoId) {
+        try {
+            out.writeObject("MensagemListaPorProjeto");
+            in.readObject();
+            out.writeObject(projetoId);
+            out.writeObject(depoisDoId);
+            ArrayList<Mensagem> lista = (ArrayList<Mensagem>) in.readObject();
+            return lista != null ? lista : new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }
