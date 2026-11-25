@@ -3,6 +3,7 @@ package modelDominio;
 import java.io.Serializable;
 import java.util.Date;
 
+// Arquivo enviado em uma tarefa (tabela arquivo). Viaja pelo socket entre cliente e servidor.
 public class Arquivo implements Serializable {
 
     private static final long serialVersionUID = 125L;
@@ -13,6 +14,7 @@ public class Arquivo implements Serializable {
     private Tarefa tarefa;
     private Date criadoEm;
 
+    // Construtor completo: usado ao ler um arquivo do banco
     public Arquivo(int id, String nomeArquivo, String arquivoUrl, Usuario usuario, Tarefa tarefa, Date criadoEm) {
         this.id = id;
         this.nomeArquivo = nomeArquivo;
@@ -22,6 +24,7 @@ public class Arquivo implements Serializable {
         this.criadoEm = criadoEm;
     }
 
+    // Construtor sem id: usado para cadastrar um arquivo novo
     public Arquivo(String nomeArquivo, String arquivoUrl, Usuario usuario, Tarefa tarefa) {
         this.nomeArquivo = nomeArquivo;
         this.arquivoUrl = arquivoUrl;
@@ -29,6 +32,7 @@ public class Arquivo implements Serializable {
         this.tarefa = tarefa;
     }
 
+    // Getters e setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getNomeArquivo() { return nomeArquivo; }
@@ -42,6 +46,7 @@ public class Arquivo implements Serializable {
     public Date getCriadoEm() { return criadoEm; }
     public void setCriadoEm(Date criadoEm) { this.criadoEm = criadoEm; }
 
+    // Texto usado para mostrar o objeto no console/depuração
     @Override
     public String toString() {
         return "Arquivo{" + "id=" + id + ", nomeArquivo=" + nomeArquivo + "}";

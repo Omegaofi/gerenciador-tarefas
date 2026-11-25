@@ -1,0 +1,258 @@
+/*
+ * Clique em nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt para alterar esta licença
+ * Clique em nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java para editar este modelo
+ */
+package gerenciador.tarefas.cliente.view;
+
+import gerenciador.tarefas.cliente.GerenciadorTarefasCliente;
+import gerenciador.tarefas.cliente.view.tema.Tema;
+import java.awt.Font;
+import java.awt.Frame;
+import javax.swing.JOptionPane;
+import modelDominio.Projeto;
+import modelDominio.Usuario;
+
+/**
+ *
+ * @author theis
+ */
+public class FormProjeto1 extends javax.swing.JDialog {
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormProjeto1.class.getName());
+
+    private static final String[] AREAS = {"Desenvolvimento Web", "Desenvolvimento Mobile",
+        "Desenvolvimento Desktop", "Jogos", "Ciência de Dados", "Inteligência Artificial",
+        "Design / UX", "Infraestrutura e Redes", "Outra"};
+
+    private final Projeto projeto;
+    private final Runnable aoSalvar;
+
+    /**
+     * @param projeto projeto a editar, ou null para criar um novo
+     * @param aoSalvar executado depois de salvar com sucesso (ex.: atualizar a tabela)
+     */
+    public FormProjeto1(Frame dono, Projeto projeto, Runnable aoSalvar) {
+        super(dono, true);
+        initComponents();
+        estilizarComponentes();
+        this.projeto = projeto;
+        this.aoSalvar = aoSalvar;
+
+        getContentPane().setBackground(Tema.FUNDO);
+        getRootPane().setDefaultButton(botaoSalvar);
+        setTitle(projeto == null ? "Novo projeto" : "Editar projeto");
+        lblCabecalho.setText(getTitle());
+        lblSubtitulo.setText("Responsável: " + GerenciadorTarefasCliente.conexaoCliente.getUsuarioLogado().getNome());
+        botaoSalvar.setText(projeto == null ? "Criar projeto" : "Salvar");
+
+        jComboBoxArea.setEditable(true);
+        Tema.estilizarCombo(jComboBoxArea);
+        Tema.estilizarCombo(jComboBoxStatus);
+        jScrollPane1.setBorder(null);
+
+        if (projeto != null) {
+            jTextFieldTitulo.setText(projeto.getTitulo());
+            jTextAreaDescricao.setText(projeto.getDescricao());
+            jComboBoxArea.setSelectedItem(projeto.getAreaAtuacao());
+            Opcao.selecionarValor(jComboBoxStatus, projeto.getStatus());
+        } else {
+            jComboBoxArea.setSelectedIndex(0);
+        }
+        finalizarLayout();
+    }
+
+    // Aplica o visual do NexProject (Tema) nos componentes criados pelo Design do NetBeans
+    private void estilizarComponentes() {
+        Tema.estilizarTitulo(lblCabecalho, 18);
+        Tema.estilizarSubtitulo(lblSubtitulo);
+        textAlerta.setFont(Tema.fonte(java.awt.Font.BOLD, 12));
+        Tema.estilizarRotulo(lblTitulo);
+        Tema.estilizarCampo(jTextFieldTitulo);
+        Tema.estilizarRotulo(lblDescricao);
+        Tema.estilizarAreaTexto(jTextAreaDescricao);
+        Tema.estilizarRotulo(lblArea);
+        Tema.estilizarRotulo(lblStatus);
+        Tema.estilizarBotao(botaoCancelar, Tema.SECUNDARIO);
+        Tema.estilizarBotao(botaoSalvar, Tema.PRIMARIO);
+        pack();   // recalcula o tamanho da janela com as fontes novas
+    }
+
+    /**
+     * Este método é chamado pelo construtor para montar os componentes da tela.
+     * ATENÇÃO: NÃO altere este código. O conteúdo deste método é sempre
+     * gerado novamente pelo editor visual (Design) do NetBeans.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        lblCabecalho = new javax.swing.JLabel();
+
+        lblCabecalho.setText("Novo projeto");
+        lblSubtitulo = new javax.swing.JLabel();
+        lblSubtitulo.setText("Responsável: nome do usuário");
+        textAlerta = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
+        lblTitulo.setText("Título");
+        jTextFieldTitulo = new javax.swing.JTextField();
+        lblDescricao = new javax.swing.JLabel();
+        lblDescricao.setText("Descrição");
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextAreaDescricao = new javax.swing.JTextArea();
+        jTextAreaDescricao.setRows(4);
+        lblArea = new javax.swing.JLabel();
+        lblArea.setText("Área de atuação");
+        jComboBoxArea = new javax.swing.JComboBox<>(AREAS);
+        lblStatus = new javax.swing.JLabel();
+        lblStatus.setText("Status");
+        jComboBoxStatus = new javax.swing.JComboBox<>(Opcao.deStatus("planejado", "em_andamento", "concluido", "cancelado"));
+        botaoCancelar = new javax.swing.JButton();
+        botaoCancelar.setText("Cancelar");
+        botaoSalvar = new javax.swing.JButton();
+        botaoSalvar.setText("Salvar");
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+
+
+        textAlerta.setForeground(new java.awt.Color(214, 59, 59));
+        textAlerta.setText(" ");
+
+
+
+
+
+        jScrollPane1.setViewportView(jTextAreaDescricao);
+
+
+
+
+
+        botaoCancelar.addActionListener(this::botaoCancelarActionPerformed);
+
+        botaoSalvar.addActionListener(this::botaoSalvarActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCabecalho, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                    .addComponent(lblSubtitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(textAlerta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextFieldTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblDescricao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jComboBoxArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jComboBoxStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(botaoCancelar)
+                        .addGap(10, 10, 10)
+                        .addComponent(botaoSalvar)))
+                .addGap(28, 28, 28))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(lblCabecalho)
+                .addGap(4, 4, 4)
+                .addComponent(lblSubtitulo)
+                .addGap(8, 8, 8)
+                .addComponent(textAlerta)
+                .addGap(16, 16, 16)
+                .addComponent(lblTitulo)
+                .addGap(5, 5, 5)
+                .addComponent(jTextFieldTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(lblDescricao)
+                .addGap(5, 5, 5)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(lblArea)
+                .addGap(5, 5, 5)
+                .addComponent(jComboBoxArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(lblStatus)
+                .addGap(5, 5, 5)
+                .addComponent(jComboBoxStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botaoCancelar, javax.swing.GroupLayout.Alignment.BASELINE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE)
+                    .addComponent(botaoSalvar, javax.swing.GroupLayout.Alignment.BASELINE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE))
+                .addGap(22, 22, 22))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void botaoCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelarActionPerformed
+        // Botão Cancelar: fecha sem salvar
+        dispose();
+    }//GEN-LAST:event_botaoCancelarActionPerformed
+
+    private void botaoSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvarActionPerformed
+        // Botão Salvar: valida e cria ou atualiza o projeto no servidor
+        String titulo = jTextFieldTitulo.getText().trim();
+        if (titulo.isEmpty()) {
+            textAlerta.setText("Informe o título do projeto.");
+            jTextFieldTitulo.requestFocus();
+            return;
+        }
+        Object areaSelecionada = jComboBoxArea.getSelectedItem();
+        String area = areaSelecionada != null ? areaSelecionada.toString().trim() : "";
+        String status = ((Opcao) jComboBoxStatus.getSelectedItem()).valor();
+        Usuario logado = GerenciadorTarefasCliente.conexaoCliente.getUsuarioLogado();
+
+        boolean ok;
+        if (projeto != null) {
+            Projeto projetoEditar = new Projeto(projeto.getId(), titulo, jTextAreaDescricao.getText().trim(),
+                    area, status, logado, projeto.getCriadoEm());
+            ok = GerenciadorTarefasCliente.conexaoCliente.projetoAtualizar(projetoEditar);
+        } else {
+            Projeto projetoInserir = new Projeto(titulo, jTextAreaDescricao.getText().trim(), area, status, logado);
+            ok = GerenciadorTarefasCliente.conexaoCliente.projetoInserir(projetoInserir);
+        }
+
+        if (ok) {
+            JOptionPane.showMessageDialog(this, projeto != null ? "Projeto atualizado com sucesso!" : "Projeto criado com sucesso!");
+            dispose();
+            if (aoSalvar != null) {
+                aoSalvar.run();
+            }
+        } else {
+            textAlerta.setText("Erro ao salvar o projeto. Tente novamente.");
+        }
+    }//GEN-LAST:event_botaoSalvarActionPerformed
+
+
+    /** Ajusta o tamanho ao conteúdo (largura mínima de 460px) e centraliza na tela de origem. */
+    private void finalizarLayout() {
+        pack();
+        setSize(Math.max(460, getWidth()), getHeight());
+        setLocationRelativeTo(getOwner());
+    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botaoCancelar;
+    private javax.swing.JButton botaoSalvar;
+    private javax.swing.JComboBox<String> jComboBoxArea;
+    private javax.swing.JComboBox<Opcao> jComboBoxStatus;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextAreaDescricao;
+    private javax.swing.JTextField jTextFieldTitulo;
+    private javax.swing.JLabel lblArea;
+    private javax.swing.JLabel lblCabecalho;
+    private javax.swing.JLabel lblDescricao;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblSubtitulo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel textAlerta;
+    // End of variables declaration//GEN-END:variables
+}

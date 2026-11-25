@@ -11,11 +11,13 @@ public class EntregaTableModel extends AbstractTableModel {
     private ArrayList<EntregaTarefa> lista;
     private final SimpleDateFormat sdf;
 
+    // Recebe a lista de entregas que a tabela vai mostrar
     public EntregaTableModel(ArrayList<EntregaTarefa> listaEntrega) {
         this.lista = listaEntrega != null ? listaEntrega : new ArrayList<>();
         sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     }
 
+    // Quantidade de linhas = quantidade de entregas
     @Override
     public int getRowCount() {
         return lista.size();
@@ -26,6 +28,7 @@ public class EntregaTableModel extends AbstractTableModel {
         return 5;
     }
 
+    // Valor de cada célula: tarefa, projeto, data, status...
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         EntregaTarefa entrega = lista.get(rowIndex);
@@ -47,10 +50,12 @@ public class EntregaTableModel extends AbstractTableModel {
         }
     }
 
+    // Entrega da linha selecionada
     public EntregaTarefa getEntrega(int linha) {
         return lista.get(linha);
     }
 
+    // Nome de cada coluna
     @Override
     public String getColumnName(int column) {
         switch (column) {

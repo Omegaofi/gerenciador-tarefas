@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mesma paleta do Tema.java do cliente desktop -->
+<resources>
+    <color name="preto">#0B0B0B</color>
+    <color name="preto_hover">#262626</color>
+    <color name="limao">#C6F033</color>
+    <color name="limao_hover">#B2DB22</color>
+    <color name="fundo">#F2EFEC</color>
+    <color name="card">#FFFFFF</color>
+    <color name="campo">#E9E7E2</color>
+    <color name="borda">#D9D5CF</color>
+    <color name="texto">#111111</color>
+    <color name="texto_claro">#6E6A64</color>
+    <color name="texto_menu">#B5B5B5</color>
+    <color name="vermelho">#D63B3B</color>
+    <color name="laranja">#F29D1D</color>
+    <color name="azul">#5BC0DE</color>
+    <color name="selecao">#EEF9C8</color>
+</resources>

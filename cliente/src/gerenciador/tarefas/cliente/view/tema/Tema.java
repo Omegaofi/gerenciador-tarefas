@@ -12,7 +12,9 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -26,6 +28,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicTextFieldUI;
+import javax.swing.text.JTextComponent;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -54,9 +59,11 @@ public final class Tema {
 
     private static final String FAMILIA = escolherFonte();
 
+    // Classe só de funções estáticas: não pode ser instanciada
     private Tema() {
     }
 
+    // Escolhe a primeira fonte monoespaçada instalada no computador
     private static String escolherFonte() {
         List<String> instaladas = Arrays.asList(
                 GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
@@ -68,6 +75,7 @@ public final class Tema {
         return Font.MONOSPACED;
     }
 
+    // Fonte do tema no estilo e tamanho pedidos
     public static Font fonte(int estilo, int tamanho) {
         return new Font(FAMILIA, estilo, tamanho);
     }
@@ -97,105 +105,169 @@ public final class Tema {
     }
 
     // ---------- Textos ----------
+    // As telas usam JLabel comuns (criados no Design do NetBeans) e chamam estes métodos para aplicar o visual.
 
     /** Logotipo "NEX" + "PROJECT" (PROJECT em verde-limão). */
     public static JLabel logo(int tamanho, boolean fundoEscuro) {
+        JLabel logo = new JLabel();
+        estilizarLogo(logo, tamanho, fundoEscuro);
+        return logo;
+    }
+
+    // Transforma um JLabel no logotipo; fundoEscuro = true deixa o "NEX" branco
+    public static void estilizarLogo(JLabel logo, int tamanho, boolean fundoEscuro) {
         String corNex = fundoEscuro ? "#FFFFFF" : "#0B0B0B";
-        JLabel label = new JLabel("<html><span style='color:" + corNex + "'>NEX</span>"
+        logo.setText("<html><span style='color:" + corNex + "'>NEX</span>"
                 + "<span style='color:#C6F033'>PROJECT</span></html>");
-        label.setFont(fonte(Font.BOLD, tamanho));
-        return label;
+        logo.setFont(fonte(Font.BOLD, tamanho));
     }
 
+    // Título de tela
     public static JLabel titulo(String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(fonte(Font.BOLD, 22));
-        label.setForeground(TEXTO);
-        return label;
+        JLabel titulo = new JLabel(texto);
+        estilizarTitulo(titulo);
+        return titulo;
     }
 
+    // Título padrão: negrito, 22pt
+    public static void estilizarTitulo(JLabel titulo) {
+        estilizarTitulo(titulo, 22);
+    }
+
+    // Título em negrito com o tamanho pedido
+    public static void estilizarTitulo(JLabel titulo, int tamanho) {
+        titulo.setFont(fonte(Font.BOLD, tamanho));
+        titulo.setForeground(TEXTO);
+    }
+
+    // Texto de apoio cinza
     public static JLabel subtitulo(String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(fonte(Font.PLAIN, 12));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+        JLabel subtitulo = new JLabel(texto);
+        estilizarSubtitulo(subtitulo);
+        return subtitulo;
+    }
+
+    // Texto de apoio: cinza, 12pt
+    public static void estilizarSubtitulo(JLabel subtitulo) {
+        subtitulo.setFont(fonte(Font.PLAIN, 12));
+        subtitulo.setForeground(TEXTO_CLARO);
+    }
+
+    // Texto comum na fonte do tema, com tamanho e negrito escolhidos
+    public static void estilizarTexto(JLabel texto, int tamanho, boolean negrito) {
+        texto.setFont(fonte(negrito ? Font.BOLD : Font.PLAIN, tamanho));
+        texto.setForeground(TEXTO);
     }
 
     /** Rótulo pequeno em caixa alta, usado acima dos campos (ex.: "E-MAIL"). */
     public static JLabel rotuloCampo(String texto) {
-        JLabel label = new JLabel(texto.toUpperCase());
-        label.setFont(fonte(Font.BOLD, 11));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+        JLabel rotulo = new JLabel(texto);
+        estilizarRotulo(rotulo);
+        return rotulo;
+    }
+
+    // Rótulo: cinza, negrito, 11pt e sempre em maiúsculas
+    public static void estilizarRotulo(JLabel rotulo) {
+        rotulo.setFont(fonte(Font.BOLD, 11));
+        rotulo.setForeground(TEXTO_CLARO);
+        sempreMaiusculo(rotulo);
     }
 
     /** Texto clicável, como "Cadastre-se". */
     public static JLabel link(String texto) {
-        JLabel label = new JLabel("<html><u>" + texto + "</u></html>");
-        label.setFont(fonte(Font.BOLD, 12));
-        label.setForeground(TEXTO);
-        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return label;
+        JLabel link = new JLabel(texto);
+        estilizarLink(link);
+        return link;
     }
 
-    // ---------- Estilo de componentes já criados (ex.: no designer do NetBeans) ----------
-
-    public static JLabel logo(JLabel label, int tamanho, boolean fundoEscuro) {
-        String corNex = fundoEscuro ? "#FFFFFF" : "#0B0B0B";
-        label.setText("<html><span style='color:" + corNex + "'>NEX</span>"
-                + "<span style='color:#C6F033'>PROJECT</span></html>");
-        label.setFont(fonte(Font.BOLD, tamanho));
-        return label;
+    // Link: negrito, sublinhado e com a mãozinha do mouse
+    public static void estilizarLink(JLabel link) {
+        java.util.Map<java.awt.font.TextAttribute, Object> atributos = new java.util.HashMap<>(fonte(Font.BOLD, 12).getAttributes());
+        atributos.put(java.awt.font.TextAttribute.UNDERLINE, java.awt.font.TextAttribute.UNDERLINE_ON);
+        link.setFont(fonte(Font.BOLD, 12).deriveFont(atributos));
+        link.setForeground(TEXTO);
+        link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
-    public static JLabel titulo(JLabel label) {
-        label.setFont(fonte(Font.BOLD, 22));
-        label.setForeground(TEXTO);
-        return label;
+    // Converte o texto para maiúsculas agora e toda vez que ele mudar (setText)
+    private static void sempreMaiusculo(JComponent componente) {
+        if (componente.getClientProperty("nex.maiusculo") != null) {
+            return;   // já está configurado
+        }
+        componente.putClientProperty("nex.maiusculo", Boolean.TRUE);
+        componente.addPropertyChangeListener("text", e -> converterParaMaiusculo(componente));
+        converterParaMaiusculo(componente);
     }
 
-    public static JLabel subtitulo(JLabel label) {
-        label.setFont(fonte(Font.PLAIN, 12));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+    // Troca o texto do componente pela versão em maiúsculas (se ainda não estiver)
+    private static void converterParaMaiusculo(JComponent componente) {
+        if (componente instanceof JLabel rotulo && rotulo.getText() != null
+                && !rotulo.getText().equals(rotulo.getText().toUpperCase())) {
+            rotulo.setText(rotulo.getText().toUpperCase());
+        } else if (componente instanceof AbstractButton botao && botao.getText() != null
+                && !botao.getText().equals(botao.getText().toUpperCase())) {
+            botao.setText(botao.getText().toUpperCase());
+        }
     }
 
-    public static JLabel rotuloCampo(JLabel label) {
-        label.setText(label.getText().toUpperCase());
-        label.setFont(fonte(Font.BOLD, 11));
-        label.setForeground(TEXTO_CLARO);
-        return label;
+    // ---------- Botões ----------
+
+    public static final String PRIMARIO = "primario";
+    public static final String DESTAQUE = "destaque";
+    public static final String SECUNDARIO = "secundario";
+    public static final String PERIGO = "perigo";
+
+    // Botão preto
+    public static JButton botaoPrimario(String texto) {
+        return botao(texto, PRIMARIO);
     }
 
-    public static JLabel link(JLabel label) {
-        label.setText("<html><u>" + label.getText() + "</u></html>");
-        label.setFont(fonte(Font.BOLD, 12));
-        label.setForeground(TEXTO);
-        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return label;
+    // Botão verde-limão
+    public static JButton botaoDestaque(String texto) {
+        return botao(texto, DESTAQUE);
     }
 
-    public static JButton primario(JButton botao) {
-        return estilizarBotao(botao, PRETO, PRETO_HOVER, Color.WHITE, null);
+    // Botão branco com borda
+    public static JButton botaoSecundario(String texto) {
+        return botao(texto, SECUNDARIO);
     }
 
-    public static JButton destaque(JButton botao) {
-        return estilizarBotao(botao, LIMAO, LIMAO_HOVER, TEXTO, null);
+    // Botão vermelho (excluir)
+    public static JButton botaoPerigo(String texto) {
+        return botao(texto, PERIGO);
     }
 
-    public static JButton secundario(JButton botao) {
-        return estilizarBotao(botao, CARD, CAMPO, TEXTO, BORDA);
+    // Cria um JButton comum já com o visual do estilo pedido
+    private static JButton botao(String texto, String estilo) {
+        JButton botao = new JButton(texto);
+        estilizarBotao(botao, estilo);
+        return botao;
     }
 
-    public static JButton perigo(JButton botao) {
-        return estilizarBotao(botao, CARD, new Color(0xFB, 0xE9, 0xE9), VERMELHO, VERMELHO);
-    }
-
-    private static JButton estilizarBotao(JButton botao, Color fundo, Color hover, Color textoCor, Color borda) {
-        botao.setUI(new VisualBotaoNex(fundo, hover, borda));
-        botao.setText(botao.getText().toUpperCase());
+    /**
+     * Deixa um botão comum (JButton) reto e plano, nas cores do estilo:
+     * PRIMARIO (preto), DESTAQUE (verde-limão), SECUNDARIO (branco com borda) ou PERIGO (vermelho).
+     * Pode ser chamado de novo para trocar o estilo (ex.: botão selecionado).
+     */
+    public static void estilizarBotao(AbstractButton botao, String estilo) {
+        Color fundo;
+        Color hover;
+        Color borda;
+        switch (estilo == null ? PRIMARIO : estilo) {
+            case DESTAQUE:
+                fundo = LIMAO; hover = LIMAO_HOVER; borda = null; botao.setForeground(TEXTO);
+                break;
+            case SECUNDARIO:
+                fundo = CARD; hover = CAMPO; borda = BORDA; botao.setForeground(TEXTO);
+                break;
+            case PERIGO:
+                fundo = CARD; hover = new Color(0xFB, 0xE9, 0xE9); borda = VERMELHO; botao.setForeground(VERMELHO);
+                break;
+            default:
+                fundo = PRETO; hover = PRETO_HOVER; borda = null; botao.setForeground(Color.WHITE);
+        }
+        botao.setUI(new BotaoUI(fundo, hover, borda));
         botao.setFont(fonte(Font.BOLD, 12));
-        botao.setForeground(textoCor);
         botao.setContentAreaFilled(false);
         botao.setFocusPainted(false);
         botao.setBorderPainted(false);
@@ -203,27 +275,30 @@ public final class Tema {
         botao.setRolloverEnabled(true);
         botao.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
         botao.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return botao;
+        sempreMaiusculo(botao);   // texto dos botões sempre em caixa alta, como nos wireframes
+        botao.repaint();
     }
 
-    /** Pinta o botão plano do NexProject em cima de um JButton comum. */
-    private static class VisualBotaoNex extends javax.swing.plaf.basic.BasicButtonUI {
+    /** Desenha o botão: fundo (mais escuro com o mouse em cima), borda opcional e o texto. */
+    private static final class BotaoUI extends BasicButtonUI {
 
         private final Color fundo;
         private final Color hover;
         private final Color borda;
 
-        VisualBotaoNex(Color fundo, Color hover, Color borda) {
+        // Guarda as cores do estilo escolhido
+        BotaoUI(Color fundo, Color hover, Color borda) {
             this.fundo = fundo;
             this.hover = hover;
             this.borda = borda;
         }
 
+        // Pinta o fundo e a borda; o texto é desenhado pelo BasicButtonUI
         @Override
         public void paint(Graphics g, JComponent c) {
-            javax.swing.AbstractButton botao = (javax.swing.AbstractButton) c;
+            ButtonModel modelo = ((AbstractButton) c).getModel();
             Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(botao.getModel().isRollover() || botao.getModel().isPressed() ? hover : fundo);
+            g2.setColor(modelo.isRollover() || modelo.isPressed() ? hover : fundo);
             g2.fillRect(0, 0, c.getWidth(), c.getHeight());
             if (borda != null) {
                 g2.setColor(borda);
@@ -235,101 +310,84 @@ public final class Tema {
         }
     }
 
-    // ---------- Botões ----------
-
-    public static JButton botaoPrimario(String texto) {
-        return new BotaoNex(texto, PRETO, PRETO_HOVER, Color.WHITE, null);
-    }
-
-    public static JButton botaoDestaque(String texto) {
-        return new BotaoNex(texto, LIMAO, LIMAO_HOVER, TEXTO, null);
-    }
-
-    public static JButton botaoSecundario(String texto) {
-        return new BotaoNex(texto, CARD, CAMPO, TEXTO, BORDA);
-    }
-
-    public static JButton botaoPerigo(String texto) {
-        return new BotaoNex(texto, CARD, new Color(0xFB, 0xE9, 0xE9), VERMELHO, VERMELHO);
-    }
-
-    /** Botão retangular e plano, pintado à mão para ficar igual em qualquer Windows. */
-    private static class BotaoNex extends JButton {
-
-        private final Color fundo;
-        private final Color hover;
-        private final Color borda;
-
-        BotaoNex(String texto, Color fundo, Color hover, Color textoCor, Color borda) {
-            super(texto.toUpperCase());
-            this.fundo = fundo;
-            this.hover = hover;
-            this.borda = borda;
-            setFont(fonte(Font.BOLD, 12));
-            setForeground(textoCor);
-            setContentAreaFilled(false);
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(getModel().isRollover() || getModel().isPressed() ? hover : fundo);
-            g2.fillRect(0, 0, getWidth(), getHeight());
-            if (borda != null) {
-                g2.setColor(borda);
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            }
-            g2.dispose();
-            super.paintComponent(g);
-        }
-    }
-
     // ---------- Campos ----------
 
+    // Borda fina dos campos, com espaço interno
     private static Border bordaCampo() {
         return BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDA),
                 BorderFactory.createEmptyBorder(8, 10, 8, 10));
     }
 
+    // Aplica cor, borda e fonte do tema em um campo
     public static void estilizarCampo(JComponent campo) {
         campo.setBackground(CAMPO);
         campo.setForeground(TEXTO);
         campo.setBorder(bordaCampo());
         campo.setFont(fonte(Font.PLAIN, 13));
-        if (campo instanceof javax.swing.text.JTextComponent) {
-            ((javax.swing.text.JTextComponent) campo).setCaretColor(TEXTO);
+        if (campo instanceof JTextComponent texto) {
+            texto.setCaretColor(TEXTO);
         }
     }
 
-    public static JTextField campoTexto() {
-        JTextField campo = new JTextField();
-        estilizarCampo(campo);
-        campo.setCaretColor(TEXTO);
-        return campo;
-    }
-
-    public static JPasswordField campoSenha() {
-        JPasswordField campo = new JPasswordField();
-        estilizarCampo(campo);
-        campo.setCaretColor(TEXTO);
-        return campo;
-    }
-
-    public static JTextArea areaTexto(int linhas) {
-        JTextArea area = new JTextArea(linhas, 20);
+    // Área de texto: quebra a linha sozinha, nas palavras, e usa o estilo dos campos
+    public static void estilizarAreaTexto(JTextArea area) {
+        if (area.getRows() == 0) {
+            area.setRows(4);
+        }
+        if (area.getColumns() == 0) {
+            area.setColumns(20);
+        }
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         estilizarCampo(area);
+    }
+
+    /** Mostra um texto cinza (placeholder) no campo enquanto ele está vazio, ex.: "Buscar projetos...". */
+    public static void dica(JTextField campo, String dica) {
+        campo.setUI(new BasicTextFieldUI() {
+            // Desenha o campo normalmente e, se estiver vazio, escreve a dica em cinza
+            @Override
+            protected void paintSafely(Graphics g) {
+                super.paintSafely(g);
+                if (campo.getText().isEmpty() && dica != null && !dica.isEmpty()) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    g2.setColor(TEXTO_CLARO);
+                    g2.setFont(campo.getFont());
+                    Insets margem = campo.getInsets();
+                    int y = (campo.getHeight() + g2.getFontMetrics().getAscent() - g2.getFontMetrics().getDescent()) / 2;
+                    g2.drawString(dica, margem.left, y);
+                    g2.dispose();
+                }
+            }
+        });
+        estilizarCampo(campo);
+        campo.repaint();
+    }
+
+    // Campo de texto no estilo do tema
+    public static JTextField campoTexto() {
+        JTextField campo = new JTextField();
+        estilizarCampo(campo);
+        return campo;
+    }
+
+    // Campo de senha no estilo do tema
+    public static JPasswordField campoSenha() {
+        JPasswordField campo = new JPasswordField();
+        estilizarCampo(campo);
+        return campo;
+    }
+
+    // Área de texto com a quantidade de linhas pedida
+    public static JTextArea areaTexto(int linhas) {
+        JTextArea area = new JTextArea(linhas, 20);
+        estilizarAreaTexto(area);
         return area;
     }
 
+    // Aplica o estilo do tema em um combo
     public static <T> void estilizarCombo(JComboBox<T> combo) {
         combo.setBackground(CAMPO);
         combo.setForeground(TEXTO);
@@ -441,6 +499,7 @@ public final class Tema {
         return label;
     }
 
+    // Cor do projeto conforme o status
     public static Color corProjeto(String status) {
         switch (status == null ? "" : status) {
             case "em_andamento": return LIMAO;
@@ -452,6 +511,7 @@ public final class Tema {
 
     // ---------- Tabelas ----------
 
+    // Aplica o estilo do tema em uma tabela (linhas, cabeçalho, seleção)
     public static void estilizarTabela(JTable tabela, JScrollPane rolagem) {
         tabela.setRowHeight(38);
         tabela.setShowVerticalLines(false);
@@ -522,6 +582,7 @@ public final class Tema {
         };
     }
 
+    // Margem padrão do conteúdo das telas
     public static Insets margemConteudo() {
         return new Insets(28, 32, 28, 32);
     }

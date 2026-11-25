@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quadrado limão do logo NexProject -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#C6F033" android:pathData="M38,38h32v32h-32z" />
+    <path android:fillColor="#0B0B0B" android:pathData="M46,46h16v16h-16z" />
+</vector>

@@ -13,6 +13,7 @@ public class EntregaTarefaDao {
 
     private Connection con;
 
+    // Pega a conexão com o banco
     public EntregaTarefaDao() {
         con = Conexao.getConexao();
     }
@@ -26,6 +27,7 @@ public class EntregaTarefaDao {
             + "INNER JOIN usuario u ON t.usuario_id = u.id "
             + "LEFT JOIN arquivo a ON e.arquivo_id = a.id";
 
+    // Executa a consulta e monta a lista de entregas com tarefa, projeto e arquivo
     private ArrayList<EntregaTarefa> consultar(PreparedStatement stmt) throws SQLException {
         ArrayList<EntregaTarefa> lista = new ArrayList();
         ResultSet res = stmt.executeQuery();
@@ -60,20 +62,9 @@ public class EntregaTarefaDao {
         return lista;
     }
 
-    public ArrayList<EntregaTarefa> getLista() {
-        try {
-            PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " ORDER BY e.dataEntrega DESC");
-            return consultar(stmt);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     // Entregas das tarefas dos projetos de um Criador (para aprovar/rejeitar)
     public ArrayList<EntregaTarefa> getListaPorCriador(int criadorId) {
-        try {
-            PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE p.usuario_id = ? ORDER BY e.dataEntrega DESC");
+        try (PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE p.usuario_id = ? ORDER BY e.dataEntrega DESC")) {
             stmt.setInt(1, criadorId);
             return consultar(stmt);
         } catch (Exception e) {
@@ -84,8 +75,7 @@ public class EntregaTarefaDao {
 
     // Entregas feitas por um Participante (para acompanhar o resultado)
     public ArrayList<EntregaTarefa> getListaPorResponsavel(int usuarioId) {
-        try {
-            PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE t.usuario_id = ? ORDER BY e.dataEntrega DESC");
+        try (PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE t.usuario_id = ? ORDER BY e.dataEntrega DESC")) {
             stmt.setInt(1, usuarioId);
             return consultar(stmt);
         } catch (Exception e) {
@@ -94,36 +84,51 @@ public class EntregaTarefaDao {
         }
     }
 
-    // RF006: grava o link/arquivo (se houver) e registra a entrega como "enviada"
-    public boolean enviar(EntregaTarefa entrega) {
+    /**
+     * RF006: grava o link/arquivo (se houver) e registra a entrega como "enviada".
+     * Só o responsável pela tarefa entrega, e o arquivo fica no nome dele (não no usuário do objeto).
+     */
+    public boolean enviar(EntregaTarefa entrega, int responsavelId) {
         try {
+            if (entrega.getTarefa() == null) {
+                return false;
+            }
+            int tarefaId = entrega.getTarefa().getId();
+            try (PreparedStatement dona = con.prepareStatement("SELECT 1 FROM tarefa WHERE id = ? AND usuario_id = ?")) {
+                dona.setInt(1, tarefaId);
+                dona.setInt(2, responsavelId);
+                if (!dona.executeQuery().next()) {
+                    return false;   // a tarefa não é de quem está entregando
+                }
+            }
+
             Integer arquivoId = null;
             Arquivo arquivo = entrega.getArquivo();
             if (arquivo != null) {
                 String sqlArquivo = "insert into arquivo (nomeArquivo, arquivoUrl, usuario_id, tarefa_id) values (?, ?, ?, ?)";
-                PreparedStatement stmtArquivo = con.prepareStatement(sqlArquivo, Statement.RETURN_GENERATED_KEYS);
-                stmtArquivo.setString(1, arquivo.getNomeArquivo());
-                stmtArquivo.setString(2, arquivo.getArquivoUrl());
-                stmtArquivo.setInt(3, arquivo.getUsuario().getId());
-                stmtArquivo.setInt(4, entrega.getTarefa().getId());
-                stmtArquivo.executeUpdate();
-                ResultSet chaves = stmtArquivo.getGeneratedKeys();
-                if (chaves.next()) {
-                    arquivoId = chaves.getInt(1);
+                try (PreparedStatement stmtArquivo = con.prepareStatement(sqlArquivo, Statement.RETURN_GENERATED_KEYS)) {
+                    stmtArquivo.setString(1, arquivo.getNomeArquivo());
+                    stmtArquivo.setString(2, arquivo.getArquivoUrl());
+                    stmtArquivo.setInt(3, responsavelId);
+                    stmtArquivo.setInt(4, tarefaId);
+                    stmtArquivo.executeUpdate();
+                    ResultSet chaves = stmtArquivo.getGeneratedKeys();
+                    if (chaves.next()) {
+                        arquivoId = chaves.getInt(1);
+                    }
                 }
-                stmtArquivo.close();
             }
 
             String sql = "insert into entregatarefa (status, tarefa_id, arquivo_id) values ('enviada', ?, ?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setInt(1, entrega.getTarefa().getId());
-            if (arquivoId != null) {
-                stmt.setInt(2, arquivoId);
-            } else {
-                stmt.setNull(2, java.sql.Types.INTEGER);
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setInt(1, tarefaId);
+                if (arquivoId != null) {
+                    stmt.setInt(2, arquivoId);
+                } else {
+                    stmt.setNull(2, java.sql.Types.INTEGER);
+                }
+                stmt.execute();
             }
-            stmt.execute();
-            stmt.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,73 +136,43 @@ public class EntregaTarefaDao {
         }
     }
 
-    // Criador aprova (tarefa vira "concluida") ou rejeita (tarefa volta para "em_andamento")
-    public boolean avaliar(EntregaTarefa entrega) {
-        try {
-            String sql = "Update entregatarefa set status = (?) where id = (?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, entrega.getStatus());
-            stmt.setInt(2, entrega.getId());
-            stmt.execute();
-            stmt.close();
-
-            String statusTarefa = "aprovada".equals(entrega.getStatus()) ? "concluida" : "em_andamento";
-            return new TarefaDao().atualizarStatus(entrega.getTarefa().getId(), statusTarefa);
-        } catch (Exception e) {
-            e.printStackTrace();
+    /**
+     * Dono do projeto aprova (tarefa vira "concluida") ou rejeita (tarefa volta para "em_andamento").
+     * Só aceita "aprovada" ou "rejeitada", só em entrega que ainda aguarda revisão, e a tarefa
+     * que muda de status é a da entrega no banco, não a que veio no objeto.
+     */
+    public boolean avaliar(EntregaTarefa entrega, int criadorId) {
+        String novoStatus = entrega.getStatus();
+        if (!"aprovada".equals(novoStatus) && !"rejeitada".equals(novoStatus)) {
             return false;
         }
-    }
-
-    public boolean inserir(EntregaTarefa t) {
         try {
-            String sql = "insert into entregatarefa (status, tarefa_id, arquivo_id) values (?, ?, ?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, t.getStatus());
-            stmt.setInt(2, t.getTarefa().getId());
-            if (t.getArquivo() != null) {
-                stmt.setInt(3, t.getArquivo().getId());
-            } else {
-                stmt.setNull(3, java.sql.Types.INTEGER);
+            int tarefaId;
+            String busca = "SELECT e.tarefa_id FROM entregatarefa e "
+                    + "INNER JOIN tarefa t ON t.id = e.tarefa_id "
+                    + "INNER JOIN projeto p ON p.id = t.projeto_id "
+                    + "WHERE e.id = ? AND p.usuario_id = ? AND e.status IN ('enviada', 'em_revisao')";
+            try (PreparedStatement stmt = con.prepareStatement(busca)) {
+                stmt.setInt(1, entrega.getId());
+                stmt.setInt(2, criadorId);
+                ResultSet res = stmt.executeQuery();
+                if (!res.next()) {
+                    return false;   // não é do criador logado ou já foi avaliada
+                }
+                tarefaId = res.getInt(1);
             }
-            stmt.execute();
-            stmt.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    public boolean atualizar(EntregaTarefa t) {
-        try {
-            String sql = "Update entregatarefa set status = (?), tarefa_id = (?), arquivo_id = (?) where id = (?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, t.getStatus());
-            stmt.setInt(2, t.getTarefa().getId());
-            if (t.getArquivo() != null) {
-                stmt.setInt(3, t.getArquivo().getId());
-            } else {
-                stmt.setNull(3, java.sql.Types.INTEGER);
+            String sql = "Update entregatarefa set status = ? where id = ? and status IN ('enviada', 'em_revisao')";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, novoStatus);
+                stmt.setInt(2, entrega.getId());
+                if (stmt.executeUpdate() != 1) {
+                    return false;
+                }
             }
-            stmt.setInt(4, t.getId());
-            stmt.execute();
-            stmt.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    public boolean excluir(EntregaTarefa t) {
-        try {
-            String sql = "delete from entregatarefa where id = (?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setInt(1, t.getId());
-            stmt.execute();
-            stmt.close();
-            return true;
+            String statusTarefa = "aprovada".equals(novoStatus) ? "concluida" : "em_andamento";
+            return new TarefaDao().atualizarStatus(tarefaId, statusTarefa);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

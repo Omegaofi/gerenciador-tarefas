@@ -13,6 +13,7 @@ public class TarefaTableModel extends AbstractTableModel {
     private ArrayList<Tarefa> lista;
     private final SimpleDateFormat sdf;
 
+    // Recebe a lista de tarefas que a tabela vai mostrar
     public TarefaTableModel(ArrayList<Tarefa> listaTarefa) {
         this.lista = listaTarefa != null ? listaTarefa : new ArrayList<>();
         sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -34,6 +35,7 @@ public class TarefaTableModel extends AbstractTableModel {
         return status;
     }
 
+    // Quantidade de linhas = quantidade de tarefas
     @Override
     public int getRowCount() {
         return lista.size();
@@ -44,6 +46,7 @@ public class TarefaTableModel extends AbstractTableModel {
         return 5;
     }
 
+    // Valor de cada célula: título, prazo, status, projeto...
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Tarefa tarefa = lista.get(rowIndex);
@@ -63,10 +66,12 @@ public class TarefaTableModel extends AbstractTableModel {
         }
     }
 
+    // Tarefa da linha selecionada
     public Tarefa getTarefa(int linha) {
         return lista.get(linha);
     }
 
+    // Nome de cada coluna
     @Override
     public String getColumnName(int column) {
         switch (column) {

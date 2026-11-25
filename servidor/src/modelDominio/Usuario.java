@@ -3,6 +3,7 @@ package modelDominio;
 import java.io.Serializable;
 import java.util.Date;
 
+// Usuário do sistema, criador ou participante (tabela usuario). Viaja pelo socket.
 public class Usuario implements Serializable {
 
     private static final long serialVersionUID = 121L;
@@ -13,7 +14,14 @@ public class Usuario implements Serializable {
     private String biografia;
     private String tipo;
     private Date criadoEm;
+    // Chaves do chat cifrado (opção A do projeto "Chat Cifrado"), todas em Base64.
+    // A pública vai para os outros membros; a privada só viaja trancada com a senha do usuário.
+    private String chavePublica;
+    private String chavePrivadaCifrada;
+    private String saltChave;
+    private String ivChave;
 
+    // Construtor completo: usado ao ler um usuário do banco
     public Usuario(int id, String nome, String email, String senha, String biografia, String tipo, Date criadoEm) {
         this.id = id;
         this.nome = nome;
@@ -24,6 +32,7 @@ public class Usuario implements Serializable {
         this.criadoEm = criadoEm;
     }
 
+    // Construtor sem id: usado no cadastro de um usuário novo
     public Usuario(String nome, String email, String senha, String biografia, String tipo) {
         this.nome = nome;
         this.email = email;
@@ -32,11 +41,13 @@ public class Usuario implements Serializable {
         this.tipo = tipo;
     }
 
+    // Construtor só com e-mail e senha: usado no login
     public Usuario(String email, String senha) {
         this.email = email;
         this.senha = senha;
     }
 
+    // Getters e setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getNome() { return nome; }
@@ -51,7 +62,18 @@ public class Usuario implements Serializable {
     public void setTipo(String tipo) { this.tipo = tipo; }
     public Date getCriadoEm() { return criadoEm; }
     public void setCriadoEm(Date criadoEm) { this.criadoEm = criadoEm; }
+    public String getChavePublica() { return chavePublica; }
+    public void setChavePublica(String chavePublica) { this.chavePublica = chavePublica; }
+    public String getChavePrivadaCifrada() { return chavePrivadaCifrada; }
+    public void setChavePrivadaCifrada(String chavePrivadaCifrada) { this.chavePrivadaCifrada = chavePrivadaCifrada; }
+    public String getSaltChave() { return saltChave; }
+    public void setSaltChave(String saltChave) { this.saltChave = saltChave; }
+    public String getIvChave() { return ivChave; }
+    public void setIvChave(String ivChave) { this.ivChave = ivChave; }
+    // Diz se o usuário já tem as chaves do chat cifrado
+    public boolean temChaves() { return chavePublica != null && !chavePublica.isEmpty(); }
 
+    // Texto usado para mostrar o objeto no console/depuração
     @Override
     public String toString() {
         return "Usuario{" + "id=" + id + ", nome=" + nome + ", email=" + email + ", tipo=" + tipo + "}";

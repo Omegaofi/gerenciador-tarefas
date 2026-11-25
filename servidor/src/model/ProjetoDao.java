@@ -10,6 +10,7 @@ public class ProjetoDao {
 
     private Connection con;
 
+    // Pega a conexão com o banco
     public ProjetoDao() {
         con = Conexao.getConexao();
     }
@@ -17,6 +18,7 @@ public class ProjetoDao {
     private static final String SQL_LISTA = "SELECT p.*, u.nome nomeUsuario FROM projeto p "
             + "INNER JOIN usuario u ON p.usuario_id = u.id";
 
+    // Executa a consulta e monta a lista de projetos com o dono de cada um
     private ArrayList<Projeto> consultar(PreparedStatement stmt) throws SQLException {
         ArrayList<Projeto> lista = new ArrayList();
         ResultSet res = stmt.executeQuery();
@@ -40,20 +42,9 @@ public class ProjetoDao {
         return lista;
     }
 
-    public ArrayList<Projeto> getLista() {
-        try {
-            PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " ORDER BY p.criado_em DESC");
-            return consultar(stmt);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     // Projetos criados por um idealizador (Criador)
     public ArrayList<Projeto> getListaPorCriador(int criadorId) {
-        try {
-            PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE p.usuario_id = ? ORDER BY p.criado_em DESC");
+        try (PreparedStatement stmt = con.prepareStatement(SQL_LISTA + " WHERE p.usuario_id = ? ORDER BY p.criado_em DESC")) {
             stmt.setInt(1, criadorId);
             return consultar(stmt);
         } catch (Exception e) {
@@ -62,17 +53,16 @@ public class ProjetoDao {
         }
     }
 
-    public boolean inserir(Projeto t) {
-        try {
-            String sql = "insert into projeto (titulo, descricao, area_atuacao, status, usuario_id) values (?, ?, ?, ?, ?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
+    /** Insere um projeto. O dono é sempre o criador logado, não o usuário que veio no objeto. */
+    public boolean inserir(Projeto t, int criadorId) {
+        String sql = "insert into projeto (titulo, descricao, area_atuacao, status, usuario_id) values (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, t.getTitulo());
             stmt.setString(2, t.getDescricao());
             stmt.setString(3, t.getAreaAtuacao());
             stmt.setString(4, t.getStatus());
-            stmt.setInt(5, t.getUsuario().getId());
+            stmt.setInt(5, criadorId);
             stmt.execute();
-            stmt.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,33 +70,30 @@ public class ProjetoDao {
         }
     }
 
-    public boolean atualizar(Projeto t) {
-        try {
-            String sql = "Update projeto set titulo = (?), descricao = (?), area_atuacao = (?), status = (?), usuario_id = (?) where id = (?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
+    /** Atualiza um projeto, só se ele for do criador logado. O dono não muda. */
+    public boolean atualizar(Projeto t, int criadorId) {
+        String sql = "Update projeto set titulo = ?, descricao = ?, area_atuacao = ?, status = ? "
+                + "where id = ? and usuario_id = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, t.getTitulo());
             stmt.setString(2, t.getDescricao());
             stmt.setString(3, t.getAreaAtuacao());
             stmt.setString(4, t.getStatus());
-            stmt.setInt(5, t.getUsuario().getId());
-            stmt.setInt(6, t.getId());
-            stmt.execute();
-            stmt.close();
-            return true;
+            stmt.setInt(5, t.getId());
+            stmt.setInt(6, criadorId);
+            return stmt.executeUpdate() == 1;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean excluir(Projeto t) {
-        try {
-            String sql = "delete from projeto where id = (?)";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setInt(1, t.getId());
-            stmt.execute();
-            stmt.close();
-            return true;
+    /** Exclui um projeto, só se ele for do criador logado. */
+    public boolean excluir(int projetoId, int criadorId) {
+        try (PreparedStatement stmt = con.prepareStatement("delete from projeto where id = ? and usuario_id = ?")) {
+            stmt.setInt(1, projetoId);
+            stmt.setInt(2, criadorId);
+            return stmt.executeUpdate() == 1;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

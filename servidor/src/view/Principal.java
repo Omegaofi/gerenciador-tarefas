@@ -7,6 +7,7 @@ import java.net.Socket;
 
 public class Principal {
 
+    // Liga o servidor: testa o banco, abre a porta 4321 e cria uma thread para cada cliente que conectar
     public static void main(String[] args) {
         try {
             if (Conexao.getConexao() != null) {

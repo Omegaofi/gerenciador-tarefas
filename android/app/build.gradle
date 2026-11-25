@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'gerenciador.tarefas.android'
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = 'gerenciador.tarefas.android'
+        // 26: java.util.Base64 e PBKDF2WithHmacSHA256, usados pelo chat cifrado
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 1
+        versionName = '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.activity:activity:1.9.3'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    // O mesmo BCrypt do cliente desktop
+    implementation 'org.mindrot:jbcrypt:0.4'
+}

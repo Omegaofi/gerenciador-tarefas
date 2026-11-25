@@ -9,7 +9,8 @@ Sistema cliente/servidor em Java para gestão colaborativa de projetos, com dois
 |---|---|
 | `cliente/` | Aplicação desktop Java Swing (projeto NetBeans/Ant) |
 | `servidor/` | Servidor Java (socket na porta 4321) com acesso JDBC ao MySQL |
-| `banco/` | Script do banco (`banco_dados_gerenciador_projetos.sql`) e migração (`migracao_nexproject.sql`) |
+| `android/` | App Android (Gradle) que conversa com o mesmo servidor — veja `android/README.md` |
+| `banco/` | Dump completo do banco (`gerenciador_projetos.sql`), script antigo e migrações |
 | `web/` | Visualizador web do app (HTML/CSS/JS puro, sem backend) |
 
 ## Visualizador web
@@ -32,6 +33,7 @@ com a mesma identidade visual e as mesmas regras de negócio, usando dados de ex
 
 ## Executando o app Java
 
-1. Rode `banco/banco_dados_gerenciador_projetos.sql` e depois `banco/migracao_nexproject.sql` no MySQL 8+.
+1. Importe `banco/gerenciador_projetos.sql` no MySQL/MariaDB (cria o banco `gerenciador_projetos` com dados de exemplo).
 2. Ajuste usuário/senha do banco em `servidor/src/factory/Conexao.java` (padrão: `localhost:3306`, usuário `root`, senha vazia).
 3. Abra `servidor/` e `cliente/` no NetBeans; inicie o servidor e depois o cliente.
+4. Android: abra `android/` no Android Studio e rode no emulador (servidor padrão `10.0.2.2:4321`).

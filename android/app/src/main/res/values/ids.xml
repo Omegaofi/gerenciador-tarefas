@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Itens da barra inferior (montada em código: o BottomNavigationView aceita só 5) -->
+    <item name="nav_inicio" type="id" />
+    <item name="nav_projetos" type="id" />
+    <item name="nav_explorar" type="id" />
+    <item name="nav_tarefas" type="id" />
+    <item name="nav_entregas" type="id" />
+    <item name="nav_chat" type="id" />
+</resources>

@@ -1,0 +1,467 @@
+/*
+ * Clique em nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt para alterar esta licença
+ * Clique em nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java para editar este modelo
+ */
+package gerenciador.tarefas.cliente.view;
+
+import gerenciador.tarefas.cliente.GerenciadorTarefasCliente;
+import gerenciador.tarefas.cliente.controller.ConexaoController;
+import gerenciador.tarefas.cliente.view.tema.Tema;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.text.SimpleDateFormat;
+import gerenciador.tarefas.cliente.cripto.ChatCifrado;
+import gerenciador.tarefas.cliente.cripto.MensagemAberta;
+import gerenciador.tarefas.cliente.cripto.MensagemAberta.Estado;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import modelDominio.Projeto;
+import modelDominio.Tarefa;
+import modelDominio.Usuario;
+
+/**
+ * Chat do projeto (RF009): troca de mensagens entre os participantes de um mesmo projeto.
+ * O Criador conversa nos projetos que criou; o Participante, nos projetos em que tem tarefas.
+ * As mensagens são cifradas e decifradas só no app (ver {@link ChatCifrado}).
+ *
+ * @author theis
+ */
+public class TelaChat1 extends javax.swing.JFrame {
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TelaChat1.class.getName());
+
+    /** De quantos em quantos milissegundos a conversa é recarregada do servidor. */
+    private static final int INTERVALO_ATUALIZACAO = 3000;
+    private static final int LARGURA_BALAO = 380;
+
+    private final SimpleDateFormat formatoHora = new SimpleDateFormat("dd/MM HH:mm");
+    private Timer timerAtualizacao;
+    /** Mensagens já decifradas do projeto aberto; o timer só busca as de id maior que a última. */
+    private final List<MensagemAberta> conversa = new ArrayList<>();
+    private int projetoExibidoId = -1;
+    private int ultimaMensagemId = 0;
+    /** Evita recarregar a conversa a cada item adicionado no combo. */
+    private boolean carregandoProjetos;
+
+    // Abre o chat sem projeto selecionado
+    public TelaChat1() {
+        this(null);
+    }
+
+    /** Abre o chat já com o projeto informado selecionado. */
+    public TelaChat1(Projeto projetoInicial) {
+        initComponents();
+        estilizarComponentes();
+        setLocationRelativeTo(null);
+        getContentPane().setBackground(Tema.FUNDO);
+        configurarComponentes();
+        if (chat().isCofreAberto()) {
+            lblSubtitulo.setText("Cifrado de ponta a ponta (AES-256-GCM) \u00b7 sua chave: " + chat().impressaoDigital());
+        }
+        carregarProjetos(projetoInicial);
+        atualizarMensagens(true);
+        timerAtualizacao = new Timer(INTERVALO_ATUALIZACAO, e -> atualizarMensagens(false));
+        timerAtualizacao.start();
+    }
+
+    // Aplica o visual do NexProject (Tema) nos componentes criados pelo Design do NetBeans
+    private void estilizarComponentes() {
+        Tema.estilizarTitulo(lblTitulo);
+        Tema.estilizarSubtitulo(lblSubtitulo);
+        Tema.estilizarRotulo(lblConversas);
+        Tema.estilizarCampo(campoMensagem);
+        Tema.estilizarBotao(botaoEnviar, Tema.DESTAQUE);
+        pack();   // recalcula o tamanho da janela com as fontes novas
+    }
+
+    /**
+     * Este método é chamado pelo construtor para montar os componentes da tela.
+     * ATENÇÃO: NÃO altere este código. O conteúdo deste método é sempre
+     * gerado novamente pelo editor visual (Design) do NetBeans.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        menuLateral = new gerenciador.tarefas.cliente.view.MenuLateral();
+        lblTitulo = new javax.swing.JLabel();
+        lblSubtitulo = new javax.swing.JLabel();
+        lblConversas = new javax.swing.JLabel();
+        scrollConversas = new javax.swing.JScrollPane();
+        listaConversas = new javax.swing.JList<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        painelMensagens = new javax.swing.JPanel();
+        painelEnvio = new javax.swing.JPanel();
+        campoMensagem = new javax.swing.JTextField();
+        botaoEnviar = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("NexProject - Chat");
+        setMinimumSize(new java.awt.Dimension(1000, 640));
+        setPreferredSize(new java.awt.Dimension(1120, 700));
+
+        menuLateral.setItemAtivo("CHAT");
+
+        lblTitulo.setText("Chat do Projeto");
+
+        lblSubtitulo.setText("Converse com os membros do projeto");
+
+        lblConversas.setText("Conversas");
+
+        listaConversas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        listaConversas.addListSelectionListener(this::listaConversasValueChanged);
+        scrollConversas.setViewportView(listaConversas);
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        painelMensagens.setBackground(new java.awt.Color(255, 255, 255));
+        painelMensagens.setLayout(new javax.swing.BoxLayout(painelMensagens, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane1.setViewportView(painelMensagens);
+
+        painelEnvio.setOpaque(false);
+        painelEnvio.setLayout(new java.awt.BorderLayout(10, 0));
+
+        campoMensagem.addActionListener(this::campoMensagemActionPerformed);
+        painelEnvio.add(campoMensagem, java.awt.BorderLayout.CENTER);
+
+        botaoEnviar.setText("Enviar →");
+        botaoEnviar.addActionListener(this::botaoEnviarActionPerformed);
+        painelEnvio.add(botaoEnviar, java.awt.BorderLayout.EAST);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(menuLateral, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTitulo)
+                    .addComponent(lblSubtitulo)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblConversas)
+                            .addComponent(scrollConversas, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(16, 16, 16)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addComponent(painelEnvio))))
+                .addGap(32, 32, 32))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(menuLateral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(lblSubtitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblConversas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollConversas)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addGap(12, 12, 12)
+                        .addComponent(painelEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(28, 28, 28))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void listaConversasValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listaConversasValueChanged
+        // Ao escolher outra conversa na lista, carrega as mensagens dela
+        if (!evt.getValueIsAdjusting()) {
+            atualizarMensagens(true);
+        }
+    }//GEN-LAST:event_listaConversasValueChanged
+
+    private void campoMensagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_campoMensagemActionPerformed
+        // Enter no campo de mensagem envia
+        enviarMensagem();
+    }//GEN-LAST:event_campoMensagemActionPerformed
+
+    private void botaoEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEnviarActionPerformed
+        // Botão Enviar
+        enviarMensagem();
+    }//GEN-LAST:event_botaoEnviarActionPerformed
+
+    // Configura a lista de conversas, o campo de mensagem e a atualização automática
+    private void configurarComponentes() {
+        listaConversas.setBackground(Tema.CARD);
+        listaConversas.setFixedCellHeight(56);
+        listaConversas.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> lista, Object valor, int indice,
+                    boolean selecionado, boolean foco) {
+                Projeto p = (Projeto) valor;
+                JLabel c = (JLabel) super.getListCellRendererComponent(lista, "", indice, selecionado, false);
+                String titulo = p.getTitulo() == null ? "" : p.getTitulo()
+                        .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                c.setText("<html><b>" + titulo + "</b><br><span style='color:#6E6A64'>Chat do projeto</span></html>");
+                c.setFont(Tema.fonte(Font.PLAIN, 12));
+                c.setOpaque(true);
+                c.setBackground(selecionado ? Tema.LIMAO : Tema.CARD);
+                c.setForeground(Tema.TEXTO);
+                c.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, Tema.BORDA),
+                        BorderFactory.createEmptyBorder(0, 12, 0, 12)));
+                return c;
+            }
+        });
+        scrollConversas.setBorder(BorderFactory.createLineBorder(Tema.BORDA));
+        scrollConversas.getViewport().setBackground(Tema.CARD);
+        jScrollPane1.setBorder(BorderFactory.createLineBorder(Tema.BORDA));
+        jScrollPane1.getViewport().setBackground(Tema.CARD);
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
+        painelMensagens.setBackground(Tema.CARD);
+        painelMensagens.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+    }
+
+    /**
+     * Criador: projetos que criou. Participante: projetos em que foi aceito + projetos das
+     * tarefas atribuídas a ele (assim o chat aparece mesmo antes da primeira tarefa).
+     */
+    private void carregarProjetos(Projeto projetoInicial) {
+        ConexaoController conexao = GerenciadorTarefasCliente.conexaoCliente;
+        Usuario logado = conexao.getUsuarioLogado();
+        ArrayList<Projeto> projetos;
+        if (conexao.isCriador()) {
+            projetos = conexao.projetoListaPorCriador(logado.getId());
+        } else {
+            Map<Integer, Projeto> porId = new LinkedHashMap<>();
+            for (Projeto p : conexao.projetoListaParticipando()) {
+                porId.put(p.getId(), p);
+            }
+            for (Tarefa t : conexao.tarefaListaPorResponsavel(logado.getId())) {
+                if (t.getProjeto() != null) {
+                    porId.putIfAbsent(t.getProjeto().getId(), t.getProjeto());
+                }
+            }
+            projetos = new ArrayList<>(porId.values());
+        }
+
+        carregandoProjetos = true;
+        javax.swing.DefaultListModel<Projeto> modelo = new javax.swing.DefaultListModel<>();
+        for (Projeto p : projetos) {
+            modelo.addElement(p);
+        }
+        listaConversas.setModel(modelo);
+        // Todo projeto já tem o seu chat: abre direto o informado ou, se não houver, o primeiro
+        int indiceAberto = projetos.isEmpty() ? -1 : 0;
+        if (projetoInicial != null) {
+            for (int i = 0; i < projetos.size(); i++) {
+                if (projetos.get(i).getId() == projetoInicial.getId()) {
+                    indiceAberto = i;
+                    break;
+                }
+            }
+        }
+        listaConversas.setSelectedIndex(indiceAberto);
+        carregandoProjetos = false;
+
+        boolean temProjeto = !projetos.isEmpty();
+        campoMensagem.setEnabled(temProjeto);
+        botaoEnviar.setEnabled(temProjeto);
+    }
+
+    // Projeto (conversa) selecionado na lista
+    private Projeto projetoSelecionado() {
+        return listaConversas.getSelectedValue();
+    }
+
+    // Atalho para o controle do chat cifrado
+    private ChatCifrado chat() {
+        return GerenciadorTarefasCliente.conexaoCliente.getChatCifrado();
+    }
+
+    /**
+     * Busca só as mensagens novas (id maior que a última exibida), decifra no app
+     * e redesenha a conversa. Ao trocar de projeto, recomeça do zero.
+     */
+    private void atualizarMensagens(boolean forcar) {
+        if (carregandoProjetos) {
+            return;
+        }
+        Projeto projeto = projetoSelecionado();
+        if (projeto == null) {
+            mostrarAviso("Você ainda não participa de nenhum projeto para conversar.");
+            return;
+        }
+        lblTitulo.setText("Chat \u00b7 " + projeto.getTitulo());
+        if (!chat().isCofreAberto()) {
+            campoMensagem.setEnabled(false);
+            botaoEnviar.setEnabled(false);
+            mostrarAviso("As chaves do chat não estão abertas. Saia e entre de novo para ler as mensagens.");
+            return;
+        }
+
+        boolean trocouProjeto = projeto.getId() != projetoExibidoId;
+        if (trocouProjeto) {
+            projetoExibidoId = projeto.getId();
+            conversa.clear();
+            ultimaMensagemId = 0;
+        }
+        List<MensagemAberta> novas = chat().carregar(projeto, ultimaMensagemId);
+        if (novas.isEmpty() && !trocouProjeto && !forcar) {
+            return;   // nada novo: não redesenha, para não atrapalhar quem está rolando
+        }
+        conversa.addAll(novas);
+        if (!novas.isEmpty()) {
+            ultimaMensagemId = novas.get(novas.size() - 1).id();
+        }
+
+        if (conversa.isEmpty()) {
+            mostrarAviso("Nenhuma mensagem ainda. Envie a primeira!");
+            return;
+        }
+        painelMensagens.removeAll();
+        int meuId = GerenciadorTarefasCliente.conexaoCliente.getUsuarioLogado().getId();
+        for (MensagemAberta m : conversa) {
+            painelMensagens.add(linhaMensagem(m, m.autorId() == meuId));
+            painelMensagens.add(Box.createVerticalStrut(10));
+        }
+        painelMensagens.revalidate();
+        painelMensagens.repaint();
+        rolarParaFim();
+    }
+
+    // Mostra um aviso no lugar das mensagens
+    private void mostrarAviso(String texto) {
+        painelMensagens.removeAll();
+        JLabel aviso = Tema.subtitulo(texto);
+        aviso.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painelMensagens.add(aviso);
+        painelMensagens.revalidate();
+        painelMensagens.repaint();
+    }
+
+    /** Uma linha da conversa: balão à direita (minha mensagem, em verde-limão) ou à esquerda (dos outros). */
+    private JPanel linhaMensagem(MensagemAberta m, boolean minha) {
+        JPanel balao = new JPanel();
+        balao.setLayout(new BoxLayout(balao, BoxLayout.Y_AXIS));
+        balao.setBackground(minha ? Tema.LIMAO : Tema.FUNDO);
+        balao.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(minha ? Tema.LIMAO_HOVER : Tema.BORDA),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)));
+
+        String autor = minha ? "Você" : m.autorNome();
+        String hora = m.dataEnvio() != null ? formatoHora.format(m.dataEnvio()) : "";
+        JLabel cabecalho = new JLabel(autor.toUpperCase() + "  \u00b7  " + hora);
+        cabecalho.setFont(Tema.fonte(Font.BOLD, 10));
+        cabecalho.setForeground(minha ? Tema.TEXTO : Tema.TEXTO_CLARO);
+        balao.add(cabecalho);
+        balao.add(Box.createVerticalStrut(4));
+
+        JLabel texto = new JLabel(htmlQuebrado(m.texto()));
+        boolean problema = m.estado() == Estado.CORROMPIDA || m.estado() == Estado.ANTES_DE_ENTRAR;
+        texto.setFont(Tema.fonte(problema ? Font.ITALIC : Font.PLAIN, 13));
+        texto.setForeground(m.estado() == Estado.CORROMPIDA ? Tema.VERMELHO
+                : m.estado() == Estado.ANTES_DE_ENTRAR ? Tema.TEXTO_CLARO : Tema.TEXTO);
+        balao.add(texto);
+
+        JPanel linha = new JPanel(new FlowLayout(minha ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));
+        linha.setOpaque(false);
+        linha.add(balao);
+        linha.setAlignmentX(Component.LEFT_ALIGNMENT);
+        linha.setMaximumSize(new Dimension(Integer.MAX_VALUE, linha.getPreferredSize().height));
+        return linha;
+    }
+
+    /** Escapa o texto e limita a largura do balão, deixando o JLabel quebrar as linhas. */
+    private String htmlQuebrado(String conteudo) {
+        String seguro = (conteudo == null ? "" : conteudo)
+                .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace("\n", "<br>");
+        JLabel medida = new JLabel("<html>" + seguro + "</html>");
+        medida.setFont(Tema.fonte(Font.PLAIN, 13));
+        if (medida.getPreferredSize().width > LARGURA_BALAO) {
+            return "<html><div style='width:" + LARGURA_BALAO + "px'>" + seguro + "</div></html>";
+        }
+        return "<html>" + seguro + "</html>";
+    }
+
+    // Rola a conversa até a última mensagem
+    private void rolarParaFim() {
+        SwingUtilities.invokeLater(() -> {
+            javax.swing.JScrollBar barra = jScrollPane1.getVerticalScrollBar();
+            barra.setValue(barra.getMaximum());
+        });
+    }
+
+    /** Cifra no app e envia: o servidor só recebe o texto embaralhado e as cópias da chave. */
+    private void enviarMensagem() {
+        Projeto projeto = projetoSelecionado();
+        String conteudo = campoMensagem.getText().trim();
+        if (projeto == null) {
+            JOptionPane.showMessageDialog(this, "Selecione uma conversa.");
+            return;
+        }
+        if (conteudo.isEmpty()) {
+            campoMensagem.requestFocus();
+            return;
+        }
+        try {
+            List<String> semChat = chat().enviar(projeto, conteudo);
+            campoMensagem.setText("");
+            atualizarMensagens(true);
+            if (!semChat.isEmpty()) {
+                JOptionPane.showMessageDialog(this, String.join(", ", semChat)
+                        + (semChat.size() == 1 ? " ainda não ativou o chat" : " ainda não ativaram o chat")
+                        + " e não vai ler esta mensagem.\nO chat é ativado no próximo login de cada membro.",
+                        "Chat cifrado", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception e) {
+            logger.log(java.util.logging.Level.WARNING, "Falha ao enviar mensagem cifrada", e);
+            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem: " + e.getMessage());
+        }
+        campoMensagem.requestFocus();
+    }
+
+    // Ao fechar a tela, para a atualização automática das mensagens
+    @Override
+    public void dispose() {
+        if (timerAtualizacao != null) {
+            timerAtualizacao.stop();
+        }
+        super.dispose();
+    }
+
+    /**
+     * @param args os argumentos da linha de comando
+     */
+    public static void main(String args[]) {
+        Tema.aplicar();
+        java.awt.EventQueue.invokeLater(() -> new TelaChat1().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botaoEnviar;
+    private javax.swing.JTextField campoMensagem;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblConversas;
+    private javax.swing.JLabel lblSubtitulo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JList<Projeto> listaConversas;
+    private gerenciador.tarefas.cliente.view.MenuLateral menuLateral;
+    private javax.swing.JPanel painelEnvio;
+    private javax.swing.JPanel painelMensagens;
+    private javax.swing.JScrollPane scrollConversas;
+    // End of variables declaration//GEN-END:variables
+}
